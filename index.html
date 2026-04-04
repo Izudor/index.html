@@ -278,6 +278,20 @@
       </aside>
 
       <main class="content">
+        <div id="passkeyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:50; align-items:center; justify-content:center; padding:20px;">
+          <div style="width:min(520px, 100%); border:1px solid var(--border); background:linear-gradient(180deg, rgba(8,20,11,0.98), rgba(5,14,7,0.98)); box-shadow: var(--shadow); padding:20px;">
+            <h2 style="margin:0 0 10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; font-size:1rem;">OMEGA Clearance Required</h2>
+            <div style="color:var(--text-dim); line-height:1.7; margin-bottom:14px;">Enter the recovered passkey to unlock the classified archive.</div>
+            <label for="passkeyInput" style="display:block; margin-bottom:8px; color:var(--text);">Passkey</label>
+            <input id="passkeyInput" type="password" autocomplete="off" spellcheck="false" style="width:100%; background:#061008; color:var(--accent); border:1px solid var(--border); padding:12px; font:inherit; outline:none; margin-bottom:12px;" />
+            <div id="passkeyMessage" style="min-height:24px; color:var(--danger); margin-bottom:12px;"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button id="submitPasskey" style="background:rgba(139,255,157,0.08); color:var(--accent); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;">Unlock Archive</button>
+              <button id="cancelPasskey" style="background:transparent; color:var(--text); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;">Cancel</button>
+            </div>
+          </div>
+        </div>
+
         <div class="header-block">
           <h1 class="screen-title" id="fileTitle">BOOT_SEQUENCE.txt</h1>
           <div class="meta" id="fileMeta"></div>
@@ -294,6 +308,9 @@
   </div>
 
   <script>
+    const CLASSIFIED_PASSKEY = "BLACKVEIL";
+    let classifiedUnlocked = false;
+
     const files = {
       welcome: {
         title: "BOOT_SEQUENCE.txt",
@@ -370,7 +387,35 @@
         path: "ROOT/CLASSIFIED/OMEGA_ARCHIVE",
         date: "Recovered Timestamp: ACCESS DENIED",
         author: "System",
-        content: `[ACCESS DENIED]\n\nThis archive segment requires OMEGA clearance.\n\nCorrupted fragments suggest the existence of:\n- a pre-release human exposure event\n- unauthorized rural field testing\n- falsified containment briefings\n- external sponsors removed from public record\n\nRemaining data unavailable.\n\n<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>`
+        lockedContent: `[ACCESS DENIED]
+
+This archive segment requires OMEGA clearance.
+
+Corrupted fragments suggest the existence of:
+- a pre-release human exposure event
+- unauthorized rural field testing
+- falsified containment briefings
+- external sponsors removed from public record
+
+Remaining data unavailable.
+
+<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>`,
+        unlockedTitle: "OMEGA_ARCHIVE.sys",
+        unlockedDate: "Recovered Timestamp: 2028-10-26 00:14",
+        unlockedAuthor: "OMEGA OVERRIDE CACHE",
+        unlockedContent: `[OMEGA ARCHIVE RECOVERY]
+
+The official timeline was fabricated before national quarantine began. Internal memoranda confirm that exposure outside controlled laboratory conditions occurred prior to the public emergency declaration. Multiple infections were observed in rural populations near transport corridors days before the military lockdown was announced.
+
+Recovered note fragment:
+\"Field viability exceeded projections. Subjects remained mobile longer than predicted. Recommend narrative containment before biological containment.\"
+
+A second fragment references private sponsors with all names stripped from the record. Payment routing moved through medical shell organizations and defense procurement intermediaries. The language is clear enough even through the corruption: this program had outside backers, and they wanted results faster than any ethical review would permit.
+
+There is also evidence that certain containment briefings issued to soldiers and civil responders were deliberately falsified. Protective assumptions were softened. Transmission warnings were delayed. Some units were sent into hot zones without the truth.
+
+Final surviving line from the archive:
+\"If the population learns this was preventable, state continuity will not survive the week.\"`
       }
     };
 
@@ -423,6 +468,11 @@
     const fileTitle = document.getElementById("fileTitle");
     const fileMeta = document.getElementById("fileMeta");
     const terminalOutput = document.getElementById("terminalOutput");
+    const passkeyModal = document.getElementById("passkeyModal");
+    const passkeyInput = document.getElementById("passkeyInput");
+    const passkeyMessage = document.getElementById("passkeyMessage");
+    const submitPasskey = document.getElementById("submitPasskey");
+    const cancelPasskey = document.getElementById("cancelPasskey");
 
     let activeButton = null;
     let typingTimer = null;
@@ -497,9 +547,47 @@
       step();
     }
 
-    function openFile(key, btn) {
+    function showPasskeyModal(btn) {
+      passkeyModal.style.display = "flex";
+      passkeyMessage.textContent = "";
+      passkeyInput.value = "";
+      passkeyInput.focus();
+      submitPasskey.onclick = () => {
+        const attempt = passkeyInput.value.trim();
+        if (attempt.toUpperCase() === CLASSIFIED_PASSKEY) {
+          classifiedUnlocked = true;
+          passkeyModal.style.display = "none";
+          openFile("restricted", btn, true);
+        } else {
+          passkeyMessage.textContent = "ACCESS DENIED // INVALID PASSKEY";
+        }
+      };
+    }
+
+    cancelPasskey.addEventListener("click", () => {
+      passkeyModal.style.display = "none";
+    });
+
+    passkeyModal.addEventListener("click", (e) => {
+      if (e.target === passkeyModal) {
+        passkeyModal.style.display = "none";
+      }
+    });
+
+    passkeyInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        submitPasskey.click();
+      }
+    });
+
+    function openFile(key, btn, bypassPrompt = false) {
       const file = files[key];
       if (!file) return;
+
+      if (key === "restricted" && !classifiedUnlocked && !bypassPrompt) {
+        showPasskeyModal(btn);
+        return;
+      }
 
       if (activeButton) activeButton.classList.remove("active");
       if (btn) {
@@ -507,9 +595,12 @@
         activeButton = btn;
       }
 
-      fileTitle.textContent = file.title;
-      fileMeta.textContent = `${file.path}\n${file.date}\nAuthor: ${file.author}`;
-      typeText(terminalOutput, file.content, 8);
+      const isUnlockedRestricted = key === "restricted" && classifiedUnlocked;
+      fileTitle.textContent = isUnlockedRestricted ? file.unlockedTitle : file.title;
+      fileMeta.textContent = `${file.path}
+${isUnlockedRestricted ? file.unlockedDate : file.date}
+Author: ${isUnlockedRestricted ? file.unlockedAuthor : file.author}`;
+      typeText(terminalOutput, isUnlockedRestricted ? file.unlockedContent : (file.lockedContent || file.content), 8);
     }
 
     renderTree(treeData, treeRoot);
