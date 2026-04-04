@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chernarus Archive Terminal</title>
+  <style>
+    :root {
+      --bg: #07110a;
+      --panel: #09170c;
+      --panel-2: #0d1d10;
+      --text: #8bff9d;
+      --text-dim: #5dc86f;
+      --accent: #b7ff87;
+      --danger: #ff7f7f;
+      --border: rgba(139, 255, 157, 0.28);
+      --glow: rgba(139, 255, 157, 0.15);
+      --shadow: 0 0 0 1px rgba(139,255,157,0.08), 0 0 18px rgba(139,255,157,0.06);
+      --font: "Courier New", Courier, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(72, 255, 103, 0.06), transparent 32%),
+        linear-gradient(180deg, #040805 0%, #07110a 100%);
+      color: var(--text);
+      font-family: var(--font);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.02) 0,
+          rgba(255,255,255,0.02) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      opacity: 0.18;
+      mix-blend-mode: screen;
+    }
+
+    .shell {
+      width: min(1200px, calc(100% - 32px));
+      margin: 24px auto;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(8,20,11,0.98), rgba(5,14,7,0.98));
+      box-shadow: var(--shadow);
+      min-height: calc(100vh - 48px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(18, 41, 20, 0.9), rgba(8, 18, 10, 0.9));
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.9rem;
+    }
+
+    .brand {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .status {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      text-align: right;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 0;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(11, 25, 13, 0.9), rgba(8, 18, 10, 0.95));
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .content {
+      padding: 18px;
+      overflow: auto;
+      position: relative;
+    }
+
+    .section-title {
+      color: var(--accent);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin: 0 0 12px;
+    }
+
+    .tree, .tree ul {
+      list-style: none;
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    .tree > li { padding-left: 0; }
+
+    .folder-label,
+    .file-btn {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      text-align: left;
+      font: inherit;
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .folder-label:hover,
+    .file-btn:hover,
+    .file-btn.active {
+      background: rgba(139,255,157,0.08);
+      color: var(--accent);
+    }
+
+    .folder-label::before {
+      content: "> ";
+      color: var(--text-dim);
+    }
+
+    .folder.open > .folder-label::before {
+      content: "v ";
+      color: var(--accent);
+    }
+
+    .folder > ul {
+      display: none;
+      margin-top: 4px;
+      padding-left: 14px;
+      border-left: 1px dashed rgba(139,255,157,0.15);
+    }
+
+    .folder.open > ul { display: block; }
+
+    .file-btn.locked {
+      color: #78997f;
+    }
+
+    .file-btn.locked::after {
+      content: " [LOCKED]";
+      color: var(--danger);
+    }
+
+    .header-block {
+      border: 1px solid var(--border);
+      background: rgba(9, 22, 11, 0.75);
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 20px rgba(139,255,157,0.025);
+    }
+
+    .screen-title {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .meta {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .terminal {
+      border: 1px solid var(--border);
+      background: rgba(5, 15, 7, 0.85);
+      min-height: 420px;
+      padding: 18px;
+      box-shadow: inset 0 0 25px rgba(139,255,157,0.04);
+      white-space: pre-wrap;
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    .terminal .typing::after {
+      content: "_";
+      display: inline-block;
+      margin-left: 2px;
+      animation: blink 0.8s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text-dim);
+      font-size: 0.84rem;
+      background: rgba(8, 18, 10, 0.95);
+    }
+
+    .hint {
+      margin-top: 14px;
+      color: var(--text-dim);
+      font-size: 0.88rem;
+    }
+
+    .welcome-list {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: var(--text);
+    }
+
+    .danger { color: var(--danger); }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: 40vh;
+      }
+
+      .shell {
+        width: min(100%, calc(100% - 16px));
+        margin: 8px auto;
+        min-height: calc(100vh - 16px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <div class="brand">CHERNARUS NATIONAL RESEARCH ARCHIVE</div>
+        <div>ARCHIVE NODE // WESTERN CIVIL DEFENSE BUNKER</div>
+      </div>
+      <div class="status">
+        ACCESS LEVEL: CIVILIAN RECOVERY<br>
+        SYSTEM STATUS: DEGRADED / PARTIAL DATA LOSS
+      </div>
+    </header>
+
+    <div class="main">
+      <aside class="sidebar">
+        <h2 class="section-title">Directory</h2>
+        <ul class="tree" id="treeRoot"></ul>
+      </aside>
+
+      <main class="content">
+        <div class="header-block">
+          <h1 class="screen-title" id="fileTitle">BOOT_SEQUENCE.txt</h1>
+          <div class="meta" id="fileMeta"></div>
+        </div>
+        <div class="terminal" id="terminalOutput"></div>
+        <div class="hint">Tip: expand folders in the left directory and click files to read archived entries.</div>
+      </main>
+    </div>
+
+    <footer class="footer">
+      <div>LOCAL TERMINAL BUILD // GitHub Pages Ready</div>
+      <div>Use this as your DayZ lore terminal landing page.</div>
+    </footer>
+  </div>
+
+  <script>
+    const files = {
+      welcome: {
+        title: "BOOT_SEQUENCE.txt",
+        path: "ROOT/SYSTEM/BOOT_SEQUENCE.txt",
+        date: "Recovered Timestamp: 2028-11-03 04:17",
+        author: "Archive Daemon",
+        content: `[SYSTEM BOOT SUCCESSFUL]\n\nChernarus National Research Archive\nWestern Civil Defense Relay Node\n\nWarning: this archive contains fragmented pre-collapse records recovered from military, scientific, and civilian data clusters. Several files are corrupted. Some entries require higher clearance and remain inaccessible.\n\nAvailable directories:\n- SYSTEM_LOGS\n- RESEARCH\n- INCIDENT_REPORTS\n- MEDICAL_DATA\n- PERSONAL_LOGS\n- CLASSIFIED\n\nUser note: If you are reading this, then whatever held the line is gone. Read carefully. The truth was buried before the world ended.`
+      },
+      lastTransmission: {
+        title: "LAST_TRANSMISSION.txt",
+        path: "ROOT/SYSTEM_LOGS/LAST_TRANSMISSION.txt",
+        date: "Recovered Timestamp: 2028-11-07 23:41",
+        author: "Unknown Military Operator",
+        content: `[FINAL OUTBOUND MESSAGE]\n\nTo any surviving command element—\nContainment has failed at every tier. Civil channels are dead. Interior checkpoints are overrun. The infected are no longer responding to suppression patterns outlined in the first-stage briefing. They move faster in darkness. They gather at noise. They do not break pursuit like normal riot-response models predicted.\n\nWe were told this was a public health emergency. That was a lie.\n\nSomething in the medical brief was scrubbed before it reached us. The men started showing symptoms before direct exposure was ever confirmed. That means this thing was already here, already moving, already inside the wire.\n\nIf command still exists, they abandoned Chernarus.\n\nIf command does not exist, then God help whoever finds this archive.`
+      },
+      projectBlackStrain: {
+        title: "PROJECT_BLACK_STRAIN.txt",
+        path: "ROOT/RESEARCH/PROJECT_BLACK_STRAIN.txt",
+        date: "Recovered Timestamp: 2028-10-12 09:03",
+        author: "Dr. M. Kovač // Senior Research Lead",
+        content: `[PROJECT SUMMARY // INTERNAL USE ONLY]\n\nOriginal funding was approved under accelerated biomedical research initiatives involving retroviral repair therapies. Public-facing documentation described the work as a treatment platform for terminal immune collapse, degenerative tissue damage, and severe blood-borne disease progression.\n\nInternal research notes tell a different story.\n\nThe strain eventually designated BLACK was not developed as a civilian treatment. It was adapted from earlier retroviral work and combined with aggressive neural-targeting behavior intended to force cellular takeover at extreme speed. Early lab success produced unprecedented tissue persistence and violent host survivability. Human trials were never officially authorized.\n\nThat did not stop them.\n\nSubjects retained locomotion and predatory stimulus response long after higher reasoning deteriorated. Emotional regulation failed first. Language collapsed second. Fear response disappeared almost completely.\n\nRecommendation entered in original draft: terminate program immediately.\n\nRecommendation removed from final submission.`
+      },
+      mutationReport: {
+        title: "MUTATION_REPORT.txt",
+        path: "ROOT/RESEARCH/MUTATION_REPORT.txt",
+        date: "Recovered Timestamp: 2028-10-18 17:26",
+        author: "Research Cell B-14",
+        content: `[OBSERVATION RECORD // STRAIN BLACK]\n\nWeek 2:\nHosts present with unstable fever, photophobia, tremors, and pronounced mood volatility.\n\nWeek 3:\nVerbal decline begins. Cooperative behavior drops sharply. Subjects demonstrate fixation on movement, sound, and exposed flesh.\n\nWeek 4:\nThe virus appears to privilege function over integrity. Motor response remains active despite catastrophic psychological breakdown. Standard sedatives lose reliability. Pain aversion is severely reduced.\n\nUnexpected development:\nBlood analysis indicates continuing mutation inside live hosts. No two advanced infections are progressing identically. The strain is learning through survival pressure.\n\nResearch note appended manually:\nWe are no longer documenting a disease. We are documenting a replacement for the human mind.`
+      },
+      convoyLoss: {
+        title: "CONVOY_LOSS.txt",
+        path: "ROOT/INCIDENT_REPORTS/CONVOY_LOSS.txt",
+        date: "Recovered Timestamp: 2028-10-23 02:11",
+        author: "Field Command Log",
+        content: `[INCIDENT REPORT // REDACTED ROUTE]\n\nMedical transport convoy departed Site K at 2110 hours under armed escort. Manifest included sealed refrigeration units, two restrained patients, and one black-case materials locker transferred under signature protest by attending research staff.\n\nConvoy failed to arrive at military checkpoint Delta-6. Aerial search located three burned vehicles and widespread evidence of close-quarters violence. No survivors were recovered. Several bodies showed extensive bite trauma. One escort soldier was found at a distance of nearly half a kilometer from the main wreckage with self-inflicted gunshot wound beneath the jaw.\n\nHis final handwritten statement read:\n\"They were alive when they tore us open.\"\n\nLocker contents were never recovered.`
+      },
+      facilityShutdown: {
+        title: "FACILITY_SHUTDOWN.txt",
+        path: "ROOT/INCIDENT_REPORTS/FACILITY_SHUTDOWN.txt",
+        date: "Recovered Timestamp: 2028-10-24 14:52",
+        author: "Operations Bureau",
+        content: `[EMERGENCY DIRECTIVE]\n\nEffective immediately, Research Site K is to be sealed under full denial protocol. No personnel are to exit without military biological review. Any unauthorized breach of quarantine perimeter is to be treated as an existential contamination event.\n\nAll public communication regarding Site K is suspended. All casualty reports are to be rerouted through defense channels only. Civilian media inquiry language has been provided separately. Use the phrase \"industrial contamination accident\" and nothing else.\n\nSecondary order, appended thirty-seven minutes later:\nDestroy all nonessential records before evacuation.\n\nFinal order, appended thirteen minutes after that:\nEvacuation canceled.`
+      },
+      symptoms: {
+        title: "SYMPTOMS.txt",
+        path: "ROOT/MEDICAL_DATA/SYMPTOMS.txt",
+        date: "Recovered Timestamp: 2028-10-16 07:45",
+        author: "Medical Triage Desk",
+        content: `[FIELD SYMPTOM CHECKLIST]\n\nSuspected early infection indicators:\n- Sudden fever and profuse sweating\n- Light sensitivity\n- Short bursts of irrational anger\n- Confusion, repetition, memory gaps\n- Bleeding around eyes or nose in severe cases\n\nIntermediate-stage indicators:\n- Speech fragmentation\n- Persistent violent ideation\n- Failure to recognize familiar persons\n- Extreme territorial panic or aggression\n- Reduced response to injury and pain\n\nAdvanced-stage indicators:\n- Complete collapse of reasoning\n- Animalistic tracking behavior\n- Continuous hostility toward uninfected humans\n- Irregular vocalization and involuntary spasms\n\nWarning: subjects in advanced stages are not medically manageable in field conditions.`
+      },
+      infectionStages: {
+        title: "INFECTION_STAGES.txt",
+        path: "ROOT/MEDICAL_DATA/INFECTION_STAGES.txt",
+        date: "Recovered Timestamp: 2028-10-17 19:08",
+        author: "Emergency Containment Review Panel",
+        content: `[PROGRESSION MODEL]\n\nStage I // Incubation\nMinimal outward signs. Host remains socially functional, though irritability and fatigue may already be present. Transmission risk uncertain.\n\nStage II // Behavioral Collapse\nImpulse control destabilizes. Anxiety gives way to hostility. Paranoia increases. Sleep cycle disruption becomes severe.\n\nStage III // Cognitive Failure\nLanguage, memory integration, and moral inhibition deteriorate. Host becomes highly reactive to sensory triggers.\n\nStage IV // Predatory Persistence\nThe individual identity is effectively gone. The body remains active, driven by primitive aggression, stimulus fixation, and repeated attack behavior.\n\nMargin note from unidentified reviewer:\nStop calling them patients after Stage III. No one comes back from that.`
+      },
+      scientistJournal01: {
+        title: "SCIENTIST_JOURNAL_01.txt",
+        path: "ROOT/PERSONAL_LOGS/SCIENTIST_JOURNAL_01.txt",
+        date: "Recovered Timestamp: 2028-10-20 01:19",
+        author: "Dr. Elena Sidorov",
+        content: `[PERSONAL ENTRY]\n\nI signed onto this project because they said it would save people already condemned by the calendar. That was how they spoke in the interview—soft voices, careful smiles, promises about breakthroughs and second chances.\n\nBy the time I saw the lower laboratory, I understood none of that mattered. The subjects were not volunteers. They were selected because no one important would come looking for them. Prisoners. Migrants. The forgotten.\n\nToday Subject 12 recognized me by name and begged me not to let them inject him again. By evening he could no longer speak. He still knew enough to cry.\n\nI have copied what files I can. If this terminal remains accessible, then some part of the truth survived with it.\n\nIf anyone finds this, do not trust official histories. We did this to ourselves.`
+      },
+      guardLog02: {
+        title: "GUARD_LOG_02.txt",
+        path: "ROOT/PERSONAL_LOGS/GUARD_LOG_02.txt",
+        date: "Recovered Timestamp: 2028-10-25 03:33",
+        author: "Sgt. Anton Mirek",
+        content: `[SECURITY JOURNAL]\n\nThey changed our rules of engagement this morning. First it was restraint. Then it was lethal force only if bitten. Then it was lethal force for anyone trying to leave the lower ward.\n\nNow they're telling us not to shoot the heads because they need the bodies intact for review. Bodies. That's what they call them, even when they are still breathing and screaming through broken teeth.\n\nOne of the doctors ran for the service elevator. They dragged him back before the doors shut. I heard him yelling that the air system was compromised and that the infection wasn't spreading the way command thought it was. Nobody repeated those words afterward.\n\nI have served in riots, border actions, and two winters of insurgent cleanup. I have never seen men look this afraid.\n\nSomething got loose tonight. We all heard it in the vents.`
+      },
+      restricted: {
+        title: "OMEGA_CLEARANCE_REQUIRED",
+        path: "ROOT/CLASSIFIED/OMEGA_ARCHIVE",
+        date: "Recovered Timestamp: ACCESS DENIED",
+        author: "System",
+        content: `[ACCESS DENIED]\n\nThis archive segment requires OMEGA clearance.\n\nCorrupted fragments suggest the existence of:\n- a pre-release human exposure event\n- unauthorized rural field testing\n- falsified containment briefings\n- external sponsors removed from public record\n\nRemaining data unavailable.\n\n<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>`
+      }
+    };
+
+    const treeData = [
+      {
+        name: "SYSTEM_LOGS",
+        open: true,
+        children: [
+          { type: "file", key: "welcome", label: "BOOT_SEQUENCE.txt" },
+          { type: "file", key: "lastTransmission", label: "LAST_TRANSMISSION.txt" }
+        ]
+      },
+      {
+        name: "RESEARCH",
+        children: [
+          { type: "file", key: "projectBlackStrain", label: "PROJECT_BLACK_STRAIN.txt" },
+          { type: "file", key: "mutationReport", label: "MUTATION_REPORT.txt" }
+        ]
+      },
+      {
+        name: "INCIDENT_REPORTS",
+        children: [
+          { type: "file", key: "convoyLoss", label: "CONVOY_LOSS.txt" },
+          { type: "file", key: "facilityShutdown", label: "FACILITY_SHUTDOWN.txt" }
+        ]
+      },
+      {
+        name: "MEDICAL_DATA",
+        children: [
+          { type: "file", key: "symptoms", label: "SYMPTOMS.txt" },
+          { type: "file", key: "infectionStages", label: "INFECTION_STAGES.txt" }
+        ]
+      },
+      {
+        name: "PERSONAL_LOGS",
+        children: [
+          { type: "file", key: "scientistJournal01", label: "SCIENTIST_JOURNAL_01.txt" },
+          { type: "file", key: "guardLog02", label: "GUARD_LOG_02.txt" }
+        ]
+      },
+      {
+        name: "CLASSIFIED",
+        children: [
+          { type: "file", key: "restricted", label: "OMEGA_ARCHIVE.sys", locked: true }
+        ]
+      }
+    ];
+
+    const treeRoot = document.getElementById("treeRoot");
+    const fileTitle = document.getElementById("fileTitle");
+    const fileMeta = document.getElementById("fileMeta");
+    const terminalOutput = document.getElementById("terminalOutput");
+
+    let activeButton = null;
+    let typingTimer = null;
+
+    function renderTree(items, parent) {
+      items.forEach(item => {
+        if (item.type === "file") {
+          const li = document.createElement("li");
+          const btn = document.createElement("button");
+          btn.className = "file-btn" + (item.locked ? " locked" : "");
+          btn.textContent = item.label;
+          btn.dataset.key = item.key;
+          btn.addEventListener("click", () => openFile(item.key, btn));
+          li.appendChild(btn);
+          parent.appendChild(li);
+          return;
+        }
+
+        const li = document.createElement("li");
+        li.className = "folder" + (item.open ? " open" : "");
+
+        const label = document.createElement("button");
+        label.className = "folder-label";
+        label.textContent = item.name;
+        label.addEventListener("click", () => li.classList.toggle("open"));
+
+        const nested = document.createElement("ul");
+        renderTree(item.children || [], nested);
+
+        li.appendChild(label);
+        li.appendChild(nested);
+        parent.appendChild(li);
+      });
+    }
+
+    function typeText(target, htmlText, speed = 10) {
+      clearTimeout(typingTimer);
+      target.innerHTML = "<span class='typing'></span>";
+      const typingSpan = target.querySelector(".typing");
+
+      const stripped = htmlText
+        .replace(/<span class=\"danger\">/g, "")
+        .replace(/<\/span>/g, "");
+
+      let index = 0;
+
+      function step() {
+        const currentText = stripped.slice(0, index);
+        typingSpan.innerHTML = currentText.replace(/\n/g, "<br>");
+
+        if (htmlText.includes("<span class=\"danger\">")) {
+          typingSpan.innerHTML = typingSpan.innerHTML.replace(
+            "ERROR: USER CREDENTIALS INSUFFICIENT",
+            '<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>'
+          );
+        }
+
+        index += 2;
+        if (index <= stripped.length) {
+          typingTimer = setTimeout(step, speed);
+        } else {
+          target.innerHTML = currentText.replace(/\n/g, "<br>");
+          if (htmlText.includes("<span class=\"danger\">")) {
+            target.innerHTML = target.innerHTML.replace(
+              "ERROR: USER CREDENTIALS INSUFFICIENT",
+              '<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>'
+            );
+          }
+        }
+      }
+
+      step();
+    }
+
+    function openFile(key, btn) {
+      const file = files[key];
+      if (!file) return;
+
+      if (activeButton) activeButton.classList.remove("active");
+      if (btn) {
+        btn.classList.add("active");
+        activeButton = btn;
+      }
+
+      fileTitle.textContent = file.title;
+      fileMeta.textContent = `${file.path}\n${file.date}\nAuthor: ${file.author}`;
+      typeText(terminalOutput, file.content, 8);
+    }
+
+    renderTree(treeData, treeRoot);
+
+    window.addEventListener("load", () => {
+      const initialButton = document.querySelector('[data-key="welcome"]');
+      openFile("welcome", initialButton);
+    });
+  </script>
+</body>
+</html>
