@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chernarus Archive Terminal</title>
+  <title>LoE Pharmaceutical Systems Archive</title>
   <style>
     :root {
       --bg: #07110a;
@@ -14,12 +14,13 @@
       --accent: #b7ff87;
       --danger: #ff7f7f;
       --border: rgba(139, 255, 157, 0.28);
-      --glow: rgba(139, 255, 157, 0.15);
       --shadow: 0 0 0 1px rgba(139,255,157,0.08), 0 0 18px rgba(139,255,157,0.06);
       --font: "Courier New", Courier, monospace;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     html, body {
       margin: 0;
@@ -111,13 +112,16 @@
       margin: 0 0 12px;
     }
 
-    .tree, .tree ul {
+    .tree,
+    .tree ul {
       list-style: none;
       margin: 0;
       padding-left: 16px;
     }
 
-    .tree > li { padding-left: 0; }
+    .tree > li {
+      padding-left: 0;
+    }
 
     .folder-label,
     .file-btn {
@@ -158,7 +162,9 @@
       border-left: 1px dashed rgba(139,255,157,0.15);
     }
 
-    .folder.open > ul { display: block; }
+    .folder.open > ul {
+      display: block;
+    }
 
     .file-btn.locked {
       color: #78997f;
@@ -192,6 +198,39 @@
       white-space: pre-line;
     }
 
+    .audio-panel {
+      border: 1px solid var(--border);
+      background: rgba(6, 16, 8, 0.88);
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: inset 0 0 18px rgba(139,255,157,0.03);
+      display: none;
+    }
+
+    .audio-panel.active {
+      display: block;
+    }
+
+    .audio-label {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    .audio-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .audio-player {
+      width: 100%;
+      filter: hue-rotate(45deg) saturate(0.7) brightness(0.85);
+    }
+
     .terminal {
       border: 1px solid var(--border);
       background: rgba(5, 15, 7, 0.85);
@@ -211,7 +250,9 @@
     }
 
     @keyframes blink {
-      50% { opacity: 0; }
+      50% {
+        opacity: 0;
+      }
     }
 
     .footer {
@@ -231,13 +272,45 @@
       font-size: 0.88rem;
     }
 
-    .welcome-list {
-      margin: 14px 0 0;
-      padding-left: 18px;
-      color: var(--text);
+    .danger {
+      color: var(--danger);
     }
 
-    .danger { color: var(--danger); }
+    .redacted {
+      display: inline-block;
+      background: rgba(139,255,157,0.18);
+      color: transparent;
+      padding: 0 6px;
+      margin: 0 1px;
+      border: 1px solid rgba(139,255,157,0.14);
+      border-radius: 2px;
+      user-select: none;
+    }
+
+    .corrupt {
+      color: var(--danger);
+      text-shadow: -1px 0 rgba(139,255,157,0.30), 1px 0 rgba(255,127,127,0.24);
+      animation: corruptFlicker 1.8s infinite steps(2);
+    }
+
+    .corrupt-block {
+      color: var(--danger);
+      letter-spacing: 0.06em;
+      animation: corruptPulse 1.25s infinite steps(2);
+    }
+
+    @keyframes corruptFlicker {
+      0%, 100% { opacity: 1; filter: blur(0); }
+      20% { opacity: 0.8; }
+      40% { opacity: 1; filter: blur(0.35px); }
+      60% { opacity: 0.72; }
+      80% { opacity: 0.95; filter: blur(0.15px); }
+    }
+
+    @keyframes corruptPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.66; }
+    }
 
     @media (max-width: 900px) {
       .main {
@@ -262,12 +335,12 @@
   <div class="shell">
     <header class="topbar">
       <div>
-        <div class="brand">CHERNARUS NATIONAL RESEARCH ARCHIVE</div>
-        <div>ARCHIVE NODE // WESTERN CIVIL DEFENSE BUNKER</div>
+        <div class="brand">LoE PHARMACEUTICAL SYSTEMS</div>
+        <div>ARCHIVE NODE // INTERNAL RESEARCH TERMINAL</div>
       </div>
       <div class="status">
-        ACCESS LEVEL: CIVILIAN RECOVERY<br>
-        SYSTEM STATUS: DEGRADED / PARTIAL DATA LOSS
+        ACCESS LEVEL: EMPLOYEE ARCHIVE<br>
+        SYSTEM STATUS: DEGRADED / DATA INTEGRITY COMPROMISED
       </div>
     </header>
 
@@ -278,16 +351,53 @@
       </aside>
 
       <main class="content">
-        <div id="passkeyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:50; align-items:center; justify-content:center; padding:20px;">
-          <div style="width:min(520px, 100%); border:1px solid var(--border); background:linear-gradient(180deg, rgba(8,20,11,0.98), rgba(5,14,7,0.98)); box-shadow: var(--shadow); padding:20px;">
-            <h2 style="margin:0 0 10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; font-size:1rem;">OMEGA Clearance Required</h2>
-            <div style="color:var(--text-dim); line-height:1.7; margin-bottom:14px;">Enter the recovered passkey to unlock the classified archive.</div>
-            <label for="passkeyInput" style="display:block; margin-bottom:8px; color:var(--text);">Passkey</label>
-            <input id="passkeyInput" type="password" autocomplete="off" spellcheck="false" style="width:100%; background:#061008; color:var(--accent); border:1px solid var(--border); padding:12px; font:inherit; outline:none; margin-bottom:12px;" />
-            <div id="passkeyMessage" style="min-height:24px; color:var(--danger); margin-bottom:12px;"></div>
+        <div
+          id="passkeyModal"
+          style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:50; align-items:center; justify-content:center; padding:20px;"
+        >
+          <div
+            style="width:min(520px, 100%); border:1px solid var(--border); background:linear-gradient(180deg, rgba(8,20,11,0.98), rgba(5,14,7,0.98)); box-shadow: var(--shadow); padding:20px;"
+          >
+            <h2
+              style="margin:0 0 10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; font-size:1rem;"
+            >
+              OMEGA Clearance Required
+            </h2>
+            <div
+              style="color:var(--text-dim); line-height:1.7; margin-bottom:14px;"
+            >
+              Enter the recovered passkey to unlock the classified archive.
+            </div>
+            <label
+              for="passkeyInput"
+              style="display:block; margin-bottom:8px; color:var(--text);"
+            >
+              Passkey
+            </label>
+            <input
+              id="passkeyInput"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              style="width:100%; background:#061008; color:var(--accent); border:1px solid var(--border); padding:12px; font:inherit; outline:none; margin-bottom:12px;"
+            />
+            <div
+              id="passkeyMessage"
+              style="min-height:24px; color:var(--danger); margin-bottom:12px;"
+            ></div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button id="submitPasskey" style="background:rgba(139,255,157,0.08); color:var(--accent); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;">Unlock Archive</button>
-              <button id="cancelPasskey" style="background:transparent; color:var(--text); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;">Cancel</button>
+              <button
+                id="submitPasskey"
+                style="background:rgba(139,255,157,0.08); color:var(--accent); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;"
+              >
+                Unlock Archive
+              </button>
+              <button
+                id="cancelPasskey"
+                style="background:transparent; color:var(--text); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -296,92 +406,655 @@
           <h1 class="screen-title" id="fileTitle">BOOT_SEQUENCE.txt</h1>
           <div class="meta" id="fileMeta"></div>
         </div>
+
+        <div class="audio-panel" id="audioPanel">
+          <div class="audio-label">Recovered Audio Log</div>
+          <div class="audio-desc" id="audioDescription"></div>
+          <audio controls class="audio-player" id="audioPlayer">
+            <source id="audioSource" src="" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+
         <div class="terminal" id="terminalOutput"></div>
-        <div class="hint">Tip: expand folders in the left directory and click files to read archived entries.</div>
+        <div class="hint">
+          Tip: expand folders in the left directory and click files to read archived entries.
+        </div>
       </main>
     </div>
 
     <footer class="footer">
-      <div>LOCAL TERMINAL BUILD // GitHub Pages Ready</div>
-      <div>Use this as your DayZ lore terminal landing page.</div>
+      <div>LoE INTERNAL ARCHIVE NODE // RECOVERY SESSION ACTIVE</div>
+      <div>System degraded // partial archive access granted</div>
     </footer>
   </div>
 
   <script>
-    const CLASSIFIED_PASSKEY = "BLACKVEIL";
-    let classifiedUnlocked = false;
+    const CLASSIFIED_PASSKEYS = {
+      hostExperiment: "LUCID",
+      restricted: "BLACKVEIL",
+      fieldTesting: "SITEK12",
+      sponsorMemo: "NORESCUE",
+      continuityDirective: "VEKTOR9"
+    };
+
+    const unlockedFiles = new Set();
 
     const files = {
       welcome: {
         title: "BOOT_SEQUENCE.txt",
         path: "ROOT/SYSTEM/BOOT_SEQUENCE.txt",
         date: "Recovered Timestamp: 2028-11-03 04:17",
-        author: "Archive Daemon",
-        content: `[SYSTEM BOOT SUCCESSFUL]\n\nChernarus National Research Archive\nWestern Civil Defense Relay Node\n\nWarning: this archive contains fragmented pre-collapse records recovered from military, scientific, and civilian data clusters. Several files are corrupted. Some entries require higher clearance and remain inaccessible.\n\nAvailable directories:\n- SYSTEM_LOGS\n- RESEARCH\n- INCIDENT_REPORTS\n- MEDICAL_DATA\n- PERSONAL_LOGS\n- CLASSIFIED\n\nUser note: If you are reading this, then whatever held the line is gone. Read carefully. The truth was buried before the world ended.`
+        author: "LoE Archive Daemon",
+        content: `[LOE SYSTEM INITIALIZATION]
+
+LoE Pharmaceutical Systems
+Internal Research Archive Node
+
+Warning: This system contains restricted biomedical research data.
+Unauthorized access or distribution is prohibited.
+
+Data integrity check:
+████████████░░░░░░░░ 62%
+
+Notice:
+Several records are incomplete, altered, or intentionally removed.
+
+If you are accessing this terminal outside of authorized conditions,
+LoE is no longer in control of this system.`
       },
+
       lastTransmission: {
         title: "LAST_TRANSMISSION.txt",
         path: "ROOT/SYSTEM_LOGS/LAST_TRANSMISSION.txt",
         date: "Recovered Timestamp: 2028-11-07 23:41",
-        author: "Unknown Military Operator",
-        content: `[FINAL OUTBOUND MESSAGE]\n\nTo any surviving command element—\nContainment has failed at every tier. Civil channels are dead. Interior checkpoints are overrun. The infected are no longer responding to suppression patterns outlined in the first-stage briefing. They move faster in darkness. They gather at noise. They do not break pursuit like normal riot-response models predicted.\n\nWe were told this was a public health emergency. That was a lie.\n\nSomething in the medical brief was scrubbed before it reached us. The men started showing symptoms before direct exposure was ever confirmed. That means this thing was already here, already moving, already inside the wire.\n\nIf command still exists, they abandoned Chernarus.\n\nIf command does not exist, then God help whoever finds this archive.`
+        author: "LoE Employee: Michelle Rouke // ID: REDACTED",
+        content: `[FINAL OUTBOUND MESSAGE]
+
+[UNAUTHORIZED BROADCAST ATTEMPT DETECTED]
+[ORIGIN: LOE INTERNAL NETWORK // NODE UNKNOWN]
+[STATUS: INTERRUPTED]
+
+If this transmission reaches any external receiver, do not trust official LoE statements regarding the containment situation.
+
+This is not a localized outbreak.
+This is not an industrial accident.
+This is not under control.
+
+The pathogen designated HV-13 was never a civilian treatment project.
+
+It was engineered.
+
+It was tested.
+
+And it was released outside controlled environments before any public alert was issued.
+
+---
+
+LoE has known about cross-population exposure for days.
+
+Internal reports confirm:
+- infection outside laboratory zones prior to lockdown
+- failure of early containment projections
+- active suppression of transmission data
+
+They are not trying to stop this.
+
+They are trying to control how it is understood.
+
+---
+
+If you are hearing this, you are already at risk.
+
+The infection does not behave the way they told us.
+
+It spreads faster.
+It hides longer.
+And by the time symptoms are visible, it is already too late to isolate effectively.
+
+You need to—
+
+---
+
+[TRANSMISSION INTERRUPTION DETECTED]
+[OVERRIDE SIGNAL: INTERNAL SECURITY PROTOCOL]
+
+---
+
+Listen to me.
+
+LoE is preventing evacuation of certain regions to preserve—
+
+---
+
+<span class="corrupt">SIGNAL LOSS // DATA STREAM DESTABILIZED</span>
+
+---
+
+There are classified files proving everything. Internal memos. Field reports. Testing records. They cannot erase all of it. Some of it is still here in the system.
+
+If you can remotely access this terminal, then you are closer to the truth than anyone outside.
+
+Find the restricted archives.
+
+Do not believe what they tell you happened.
+
+---
+
+<span class="corrupt-block">CONNECTION TERMINATED</span>`
       },
-      projectBlackStrain: {
-        title: "PROJECT_BLACK_STRAIN.txt",
-        path: "ROOT/RESEARCH/PROJECT_BLACK_STRAIN.txt",
+
+      hv13Origin: {
+        title: "PROJECT_HV13_ORIGIN.txt",
+        path: "ROOT/RESEARCH/PROJECT_HV13_ORIGIN.txt",
         date: "Recovered Timestamp: 2028-10-12 09:03",
-        author: "Dr. M. Kovač // Senior Research Lead",
-        content: `[PROJECT SUMMARY // INTERNAL USE ONLY]\n\nOriginal funding was approved under accelerated biomedical research initiatives involving retroviral repair therapies. Public-facing documentation described the work as a treatment platform for terminal immune collapse, degenerative tissue damage, and severe blood-borne disease progression.\n\nInternal research notes tell a different story.\n\nThe strain eventually designated BLACK was not developed as a civilian treatment. It was adapted from earlier retroviral work and combined with aggressive neural-targeting behavior intended to force cellular takeover at extreme speed. Early lab success produced unprecedented tissue persistence and violent host survivability. Human trials were never officially authorized.\n\nThat did not stop them.\n\nSubjects retained locomotion and predatory stimulus response long after higher reasoning deteriorated. Emotional regulation failed first. Language collapsed second. Fear response disappeared almost completely.\n\nRecommendation entered in original draft: terminate program immediately.\n\nRecommendation removed from final submission.`
+        author: "Dr. J. Kovač-Whaler // Senior Research Lead",
+        content: `[PROJECT DESIGNATION: HV-13]
+[CLASSIFICATION: INTERNAL // RESTRICTED BIOLOGICAL PROGRAM]
+
+Original funding was authorized under experimental antiviral therapy initiatives focused on persistent viral infections and neural repair.
+
+The base vector was derived from a modified herpes-family virus.
+
+Public documentation described the project as a breakthrough in:
+- nerve regeneration
+- immune-resistant viral suppression
+- long-term neurological stabilization
+
+Internal objective logs contradict this.
+
+HV-13 was engineered to do more than repair.
+
+It was designed to persist.
+
+---
+
+[RESEARCH PHASE SUMMARY]
+
+The herpes-derived vector was selected for one reason:
+
+It does not leave.
+
+Once inside a host, it embeds itself into the nervous system and remains dormant indefinitely.
+
+HV-13 altered this behavior.
+
+Instead of remaining latent, the modified strain actively migrated along neural pathways, prioritizing the brainstem and limbic system.
+
+Early success metrics included:
+- accelerated tissue integration
+- resistance to immune rejection
+- sustained host motor function under extreme neurological stress
+
+These were considered breakthroughs.
+
+They should have been considered warnings.
+
+---
+
+[BEHAVIORAL EFFECTS]
+
+Initial human trials were not authorized.
+
+They were conducted anyway.
+
+Subjects did not lose function immediately.
+
+They lost control.
+
+Emotional regulation degraded first:
+- irritability
+- paranoia
+- sudden aggression
+
+Cognitive collapse followed:
+- language fragmentation
+- memory loss
+- identity dissociation
+
+Motor function remained intact.
+
+In some cases, it improved.
+
+Subjects continued moving, responding, and pursuing stimuli long after higher brain function had deteriorated.
+
+Pain response diminished.
+
+Fear response disappeared.
+
+What remained was not a patient.
+
+It was a body that refused to stop.
+
+---
+
+[MUTATION EVENT]
+
+By Week 4, HV-13 began changing inside live hosts.
+
+Blood samples no longer matched baseline strain behavior.
+
+Each infected subject became a variation.
+
+The virus adapted in real time.
+
+Transmission vectors expanded beyond initial projections.
+
+Containment protocols were updated.
+
+Then ignored.
+
+---
+
+[FINAL INTERNAL NOTE]
+
+The original purpose of HV-13 was to control viral persistence.
+
+It succeeded.
+
+The human mind was the cost.
+
+---
+
+[ATTACHED COMMENT // AUTHOR UNKNOWN]
+
+God forgive us.
+
+We did not create a cure.`
       },
+
       mutationReport: {
         title: "MUTATION_REPORT.txt",
         path: "ROOT/RESEARCH/MUTATION_REPORT.txt",
         date: "Recovered Timestamp: 2028-10-18 17:26",
         author: "Research Cell B-14",
-        content: `[OBSERVATION RECORD // STRAIN BLACK]\n\nWeek 2:\nHosts present with unstable fever, photophobia, tremors, and pronounced mood volatility.\n\nWeek 3:\nVerbal decline begins. Cooperative behavior drops sharply. Subjects demonstrate fixation on movement, sound, and exposed flesh.\n\nWeek 4:\nThe virus appears to privilege function over integrity. Motor response remains active despite catastrophic psychological breakdown. Standard sedatives lose reliability. Pain aversion is severely reduced.\n\nUnexpected development:\nBlood analysis indicates continuing mutation inside live hosts. No two advanced infections are progressing identically. The strain is learning through survival pressure.\n\nResearch note appended manually:\nWe are no longer documenting a disease. We are documenting a replacement for the human mind.`
+        content: `[OBSERVATION RECORD // HV-13]
+
+Week 1:
+Initial infection presents with mild fever, localized nerve irritation, and elevated stress response. Subjects remain fully coherent. No indication of severe neurological disruption.
+
+Week 2:
+The virus begins migrating through peripheral nerves toward central neural structures. Subjects report:
+- persistent headaches
+- sensory distortion
+- heightened emotional sensitivity
+
+Behavioral instability increases gradually.
+
+Week 3:
+Neurological interference becomes pronounced.
+
+Observed effects:
+- delayed speech processing
+- erratic emotional spikes
+- fixation on environmental stimuli (movement, sound, proximity)
+
+Subjects demonstrate difficulty distinguishing threat from non-threat.
+
+Week 4:
+HV-13 begins restructuring host neurological priorities.
+
+Key changes:
+- motor function preserved or enhanced
+- higher reasoning functions degraded
+- pain response significantly reduced
+
+Subjects remain physically capable despite severe cognitive decline.
+
+---
+
+[CRITICAL DEVELOPMENT]
+
+Blood samples indicate active mutation within each host.
+
+No two advanced infections present identically.
+
+The virus is adapting to each nervous system independently.
+
+Standardized treatment is no longer viable.
+
+---
+
+[FINAL CLASSIFICATION UPDATE]
+
+HV-13 is no longer a controllable pathogen.
+
+It is a self-adapting neural system.
+
+---
+
+[RESEARCH COMMENT // FLAGGED]
+
+The host is not dying.
+
+The host is being rewritten.`
       },
+
+      hostExperiment: {
+        title: "HOST_EXPERIMENT_LOG_LOCKED",
+        path: "ROOT/RESEARCH/HOST_EXPERIMENT_LOG",
+        date: "Recovered Timestamp: ACCESS DENIED",
+        author: "System",
+
+        lockedContent: `[ACCESS DENIED]
+
+This research file requires internal behavioral study clearance.
+
+Recovered keywords:
+- neural override testing
+- host compliance threshold
+- pain response suppression
+- cognitive fragmentation trials
+
+<span class="danger">ERROR: AUTHORIZATION REQUIRED</span>`,
+
+  unlockedTitle: "HOST_EXPERIMENT_LOG.txt",
+  unlockedDate: "Recovered Timestamp: 2028-10-15 03:22",
+  unlockedAuthor: "LoE Behavioral Research Division",
+  unlockedAudioSrc: "assets/audio/host_experiment_log.mp3",
+  unlockedAudioDescription: "Behavioral Research Division / Chamber H-12 // recovered observation audio attached to locked host experiment log.",
+
+  unlockedContent: `[BEHAVIORAL STUDY // HV-13 HOST RESPONSE]
+
+Subject ID: H-12
+Infection Stage: Late Stage III transitioning into Stage IV
+Restraint Status: Secured (full immobilization apparatus)
+
+---
+
+[OBJECTIVE]
+
+Determine whether higher cognitive functions can be re-engaged after HV-13 has degraded identity and emotional regulation.
+
+Secondary objective:
+Measure host response to controlled stimulus under extreme neurological compromise.
+
+---
+
+[PROCEDURE]
+
+Subject was restrained and exposed to repeated sensory triggers including:
+- auditory distress signals
+- visual recognition stimuli (family photographs)
+- direct verbal engagement
+
+Initial attempts to provoke recognition failed.
+
+Subject displayed no measurable emotional response to familiar faces or recorded voices.
+
+---
+
+[ESCALATION PROTOCOL]
+
+Increased stimulus intensity.
+
+Methods included:
+- prolonged exposure to high-frequency noise
+- physical stress induction
+- controlled pain application to test neural override capacity
+
+Subject remained responsive in a motor sense.
+
+No restoration of identity was observed.
+
+---
+
+[NOTABLE EVENT]
+
+At 02:11, subject began producing repeated vocalizations.
+
+Speech analysis confirmed fragmented recognition patterns.
+
+The subject repeatedly attempted to form a single sentence:
+
+"Oh God Help Me"
+
+This continued for approximately 17 seconds before degrading into incoherent vocal output.
+
+---
+
+[RESEARCHER NOTE]
+
+This suggests that fragments of identity may persist beneath HV-13 restructuring.
+
+However, these fragments are non-functional and cannot be reintegrated.
+
+---
+
+[FINAL TEST PHASE]
+
+Restraints were partially released to observe behavioral response.
+
+Subject immediately exhibited:
+- rapid locomotion
+- direct aggression toward nearest staff member
+- no hesitation or recognition
+
+Termination was authorized.
+
+---
+
+[ATTACHED AUDIO]
+
+Recovered chamber audio has been appended to this record.
+Playback may contain distress vocalization, restraint noise, and partial staff dialogue.
+
+---
+
+[FINAL COMMENT // UNAUTHORIZED ENTRY]
+
+We proved something today.
+
+Not that they are gone.
+
+But that they are still inside.
+
+They just can’t get out.`
+      },
+
       convoyLoss: {
         title: "CONVOY_LOSS.txt",
         path: "ROOT/INCIDENT_REPORTS/CONVOY_LOSS.txt",
         date: "Recovered Timestamp: 2028-10-23 02:11",
         author: "Field Command Log",
-        content: `[INCIDENT REPORT // REDACTED ROUTE]\n\nMedical transport convoy departed Site K at 2110 hours under armed escort. Manifest included sealed refrigeration units, two restrained patients, and one black-case materials locker transferred under signature protest by attending research staff.\n\nConvoy failed to arrive at military checkpoint Delta-6. Aerial search located three burned vehicles and widespread evidence of close-quarters violence. No survivors were recovered. Several bodies showed extensive bite trauma. One escort soldier was found at a distance of nearly half a kilometer from the main wreckage with self-inflicted gunshot wound beneath the jaw.\n\nHis final handwritten statement read:\n\"They were alive when they tore us open.\"\n\nLocker contents were never recovered.`
+        content: `[INCIDENT REPORT // REDACTED ROUTE]
+
+Medical transport convoy departed <span class="redacted">LOE SITE K / ROUTE DESIGNATION REMOVED</span> at 2110 hours under armed escort. Manifest included sealed refrigeration units, two restrained patients, and one black-case materials locker transferred under signature protest by attending research staff.
+
+Convoy failed to arrive at checkpoint <span class="redacted">Delta-6</span>. Aerial search located three burned vehicles and widespread evidence of close-quarters violence. No survivors were recovered. Several bodies showed extensive bite trauma. One escort field operative was found at a distance of nearly half a kilometer from the main wreckage with self-inflicted gunshot wound beneath the jaw.
+
+His final handwritten statement read:
+"- Not Human"
+
+Locker contents were listed as <span class="corrupt">TRANSFER INDEX CORRUPTED</span>. Recovery status remains unknown.`
       },
+
       facilityShutdown: {
         title: "FACILITY_SHUTDOWN.txt",
         path: "ROOT/INCIDENT_REPORTS/FACILITY_SHUTDOWN.txt",
         date: "Recovered Timestamp: 2028-10-24 14:52",
-        author: "Operations Bureau",
-        content: `[EMERGENCY DIRECTIVE]\n\nEffective immediately, Research Site K is to be sealed under full denial protocol. No personnel are to exit without military biological review. Any unauthorized breach of quarantine perimeter is to be treated as an existential contamination event.\n\nAll public communication regarding Site K is suspended. All casualty reports are to be rerouted through defense channels only. Civilian media inquiry language has been provided separately. Use the phrase \"industrial contamination accident\" and nothing else.\n\nSecondary order, appended thirty-seven minutes later:\nDestroy all nonessential records before evacuation.\n\nFinal order, appended thirteen minutes after that:\nEvacuation canceled.`
+        author: "LoE Operations Bureau",
+        content: `[EMERGENCY DIRECTIVE]
+
+Effective immediately, Research Site K is to be sealed under full denial protocol. No personnel are to exit without military biological review. Any unauthorized breach of quarantine perimeter is to be treated as an existential contamination event.
+
+All public communication regarding Site K is suspended. All casualty reports are to be rerouted through defense channels only. Civilian media inquiry language has been provided separately. Use the phrase "industrial contamination accident" and nothing else.
+
+Secondary order, appended thirty-seven minutes later:
+Destroy all nonessential records before evacuation.
+
+Final order, appended thirteen minutes after that:
+<span class="redacted">EVACUATION ROUTE / PERSONNEL PRIORITY LIST REMOVED</span>
+Evacuation canceled.`
       },
+
       symptoms: {
         title: "SYMPTOMS.txt",
         path: "ROOT/MEDICAL_DATA/SYMPTOMS.txt",
         date: "Recovered Timestamp: 2028-10-16 07:45",
         author: "Medical Triage Desk",
-        content: `[FIELD SYMPTOM CHECKLIST]\n\nSuspected early infection indicators:\n- Sudden fever and profuse sweating\n- Light sensitivity\n- Short bursts of irrational anger\n- Confusion, repetition, memory gaps\n- Bleeding around eyes or nose in severe cases\n\nIntermediate-stage indicators:\n- Speech fragmentation\n- Persistent violent ideation\n- Failure to recognize familiar persons\n- Extreme territorial panic or aggression\n- Reduced response to injury and pain\n\nAdvanced-stage indicators:\n- Complete collapse of reasoning\n- Animalistic tracking behavior\n- Continuous hostility toward uninfected humans\n- Irregular vocalization and involuntary spasms\n\nWarning: subjects in advanced stages are not medically manageable in field conditions.`
+        content: `[FIELD IDENTIFICATION GUIDE // HV-13]
+
+This document is intended for rapid identification of infected individuals.
+
+Note: infection progression varies. Not all stages present cleanly.
+
+---
+
+[EARLY STAGE // NEURAL ENTRY]
+
+Indicators:
+- low-grade fever
+- sensitivity to light and sound
+- unusual irritability
+- subtle tremors in hands or jaw
+- complaints of "pressure" behind the eyes
+
+Subjects remain socially functional.
+
+Infection is difficult to detect at this stage.
+
+---
+
+[MID STAGE // BEHAVIORAL INSTABILITY]
+
+Indicators:
+- speech delay or repetition
+- emotional volatility (rage, fear, confusion)
+- inability to focus attention
+- paranoia or misidentification of individuals
+- erratic movement patterns
+
+Subjects may appear intoxicated or psychologically unstable.
+
+Risk of sudden violence increases.
+
+---
+
+[ADVANCED STAGE // COGNITIVE FAILURE]
+
+Indicators:
+- breakdown of language
+- failure to recognize familiar people
+- loss of self-preservation behavior
+- extreme aggression toward movement or noise
+- reduced reaction to injury
+
+Subjects no longer respond to verbal commands.
+
+---
+
+[TERMINAL STAGE // PERSISTENT HOST]
+
+Indicators:
+- complete loss of identity
+- continuous movement and tracking behavior
+- fixation on uninfected individuals
+- irregular vocalizations
+- no visible fear response
+
+Pain response is minimal or absent.
+
+---
+
+[FIELD WARNING]
+
+Do not assume incapacitation based on injury.
+
+Subjects can remain mobile under conditions that would normally be fatal.
+
+---
+
+[HANDWRITTEN ADDENDUM]
+
+Stop calling them infected.
+
+They are still alive.
+
+That is the problem.`
       },
+
       infectionStages: {
         title: "INFECTION_STAGES.txt",
         path: "ROOT/MEDICAL_DATA/INFECTION_STAGES.txt",
         date: "Recovered Timestamp: 2028-10-17 19:08",
         author: "Emergency Containment Review Panel",
-        content: `[PROGRESSION MODEL]\n\nStage I // Incubation\nMinimal outward signs. Host remains socially functional, though irritability and fatigue may already be present. Transmission risk uncertain.\n\nStage II // Behavioral Collapse\nImpulse control destabilizes. Anxiety gives way to hostility. Paranoia increases. Sleep cycle disruption becomes severe.\n\nStage III // Cognitive Failure\nLanguage, memory integration, and moral inhibition deteriorate. Host becomes highly reactive to sensory triggers.\n\nStage IV // Predatory Persistence\nThe individual identity is effectively gone. The body remains active, driven by primitive aggression, stimulus fixation, and repeated attack behavior.\n\nMargin note from unidentified reviewer:\nStop calling them patients after Stage III. No one comes back from that.`
+        content: `[PROGRESSION MODEL // HV-13]
+
+Stage I // Latent Entry
+Minimal outward signs. Host remains socially functional, though irritability, fatigue, and sensory discomfort may already be present.
+
+Stage II // Behavioral Destabilization
+Impulse control begins to fail. Anxiety gives way to hostility. Sensory fixation increases. Sleep cycle disruption becomes severe.
+
+Stage III // Neurological Breakdown
+Language, memory integration, and moral inhibition deteriorate. Host becomes highly reactive to sensory triggers and perceived threats.
+
+Stage IV // Persistent Host State
+Individual identity is effectively gone. The body remains active, driven by primitive aggression, stimulus fixation, and repeated attack behavior.
+
+Margin note from unidentified reviewer:
+Stop using the word patient after Stage III. It no longer applies.`
       },
+
+      patientAudio01: {
+        title: "PATIENT_AUDIO_01.wav",
+        path: "ROOT/MEDICAL_DATA/PATIENT_AUDIO_01.wav",
+        date: "Recovered Timestamp: 2028-10-18 02:14",
+        author: "Isolation Ward Recorder",
+        audioSrc: "assets/audio/host_experiment_log.mp3",
+        audioDescription: "Isolation Ward / Bed 12 // partially damaged bedside recording recovered from LoE medical archive cache.",
+        content: `[AUDIO TRANSCRIPT // PARTIAL]
+
+Recorder note: bedside microphone engaged automatically during overnight observation. File contains heavy clipping, intermittent static, and distress vocalization.
+
+00:00:03 - Subject breathing heavily. Repeating the phrase "don't let them touch me" under breath.
+00:00:11 - Metallic impact in background. Unidentified staff voice says, "Hold him still."
+00:00:19 - Subject begins screaming. Speech becomes fragmented and increasingly incoherent.
+00:00:31 - Prolonged static burst.
+00:00:36 - Subject vocal tone shifts sharply. Sounds less panicked, more animalistic.
+00:00:44 - Second voice: "He's looking right at me."
+00:00:47 - Recording ends abruptly.`
+      },
+
       scientistJournal01: {
         title: "SCIENTIST_JOURNAL_01.txt",
         path: "ROOT/PERSONAL_LOGS/SCIENTIST_JOURNAL_01.txt",
         date: "Recovered Timestamp: 2028-10-20 01:19",
-        author: "Dr. Elena Sidorov",
-        content: `[PERSONAL ENTRY]\n\nI signed onto this project because they said it would save people already condemned by the calendar. That was how they spoke in the interview—soft voices, careful smiles, promises about breakthroughs and second chances.\n\nBy the time I saw the lower laboratory, I understood none of that mattered. The subjects were not volunteers. They were selected because no one important would come looking for them. Prisoners. Migrants. The forgotten.\n\nToday Subject 12 recognized me by name and begged me not to let them inject him again. By evening he could no longer speak. He still knew enough to cry.\n\nI have copied what files I can. If this terminal remains accessible, then some part of the truth survived with it.\n\nIf anyone finds this, do not trust official histories. We did this to ourselves.`
+        author: "Dr. Elianora 'The Table is Glass' Bauer",
+        content: `[PERSONAL ENTRY]
+
+I signed onto this project because they said it would save people already condemned by the calendar. That was how they spoke in the interview—soft voices, careful smiles, promises about breakthroughs and second chances.
+
+By the time I saw the lower laboratory, I understood none of that mattered. The subjects were not volunteers. They were selected because no one important would come looking for them. Prisoners. Migrants. The forgotten.
+
+Today Subject 12 recognized me by name and begged me not to let them inject him again. By evening he could no longer speak. He still knew enough to cry.
+
+I have copied what files I can. If this terminal remains accessible, then some part of the truth survived with it.
+
+I heard Dr. <span class="redacted">NAME REMOVED</span> arguing with security outside Lab C. He kept saying the sponsors wanted "proof of field persistence" before the quarter ended.
+
+If anyone finds this, do not trust official histories. We did this to ourselves.`
       },
+
       guardLog02: {
         title: "GUARD_LOG_02.txt",
         path: "ROOT/PERSONAL_LOGS/GUARD_LOG_02.txt",
         date: "Recovered Timestamp: 2028-10-25 03:33",
-        author: "Sgt. Anton Mirek",
-        content: `[SECURITY JOURNAL]\n\nThey changed our rules of engagement this morning. First it was restraint. Then it was lethal force only if bitten. Then it was lethal force for anyone trying to leave the lower ward.\n\nNow they're telling us not to shoot the heads because they need the bodies intact for review. Bodies. That's what they call them, even when they are still breathing and screaming through broken teeth.\n\nOne of the doctors ran for the service elevator. They dragged him back before the doors shut. I heard him yelling that the air system was compromised and that the infection wasn't spreading the way command thought it was. Nobody repeated those words afterward.\n\nI have served in riots, border actions, and two winters of insurgent cleanup. I have never seen men look this afraid.\n\nSomething got loose tonight. We all heard it in the vents.`
+        author: "Sgt. Anton Umama",
+        content: `[SECURITY JOURNAL]
+
+They changed our rules of engagement this morning. First it was restraint. Then it was lethal force only if bitten. Then it was lethal force for anyone trying to leave the lower ward.
+
+Now they're telling us not to shoot the heads because they need the bodies intact for review. Bodies. That's what they call them, even when they are still breathing and screaming through broken teeth.
+
+One of the doctors ran for the service elevator. They dragged him back before the doors shut. I heard him yelling that the air system was compromised and that the infection wasn't spreading the way LoE command thought it was. Nobody repeated those words afterward.
+
+I have served in riots, border actions, and two winters of insurgent cleanup. I have never seen men look this afraid.
+
+Something got loose tonight. We all heard it in the vents.`
       },
+
       restricted: {
         title: "OMEGA_CLEARANCE_REQUIRED",
         path: "ROOT/CLASSIFIED/OMEGA_ARCHIVE",
@@ -408,14 +1081,114 @@ Remaining data unavailable.
 The official timeline was fabricated before national quarantine began. Internal memoranda confirm that exposure outside controlled laboratory conditions occurred prior to the public emergency declaration. Multiple infections were observed in rural populations near transport corridors days before the military lockdown was announced.
 
 Recovered note fragment:
-\"Field viability exceeded projections. Subjects remained mobile longer than predicted. Recommend narrative containment before biological containment.\"
+"Field viability exceeded projections. Subjects remained mobile longer than predicted. Recommend narrative containment before biological containment."
 
 A second fragment references private sponsors with all names stripped from the record. Payment routing moved through medical shell organizations and defense procurement intermediaries. The language is clear enough even through the corruption: this program had outside backers, and they wanted results faster than any ethical review would permit.
 
 There is also evidence that certain containment briefings issued to soldiers and civil responders were deliberately falsified. Protective assumptions were softened. Transmission warnings were delayed. Some units were sent into hot zones without the truth.
 
+Recovered classification line:
+<span class="redacted">CABINET REVIEW APPENDIX / INTERNAL SURVIVAL TIERS / DO NOT DISCLOSE</span>
+
 Final surviving line from the archive:
-\"If the population learns this was preventable, state continuity will not survive the week.\"`
+"If the population learns this was preventable, state continuity will not survive the week."`
+      },
+
+      fieldTesting: {
+        title: "FIELD_TEST_RESULTS_LOCKED",
+        path: "ROOT/CLASSIFIED/FIELD_TEST_RESULTS",
+        date: "Recovered Timestamp: ACCESS DENIED",
+        author: "System",
+        lockedContent: `[ACCESS DENIED]
+
+This archive segment requires elevated field operations clearance.
+
+Keywords recovered from corrupted index:
+- rural exposure event
+- transport corridor monitoring
+- behavioral endurance
+- civilian deniability package
+
+<span class="danger">ERROR: FIELD ACCESS KEY REQUIRED</span>`,
+        unlockedTitle: "FIELD_TEST_RESULTS.sys",
+        unlockedDate: "Recovered Timestamp: 2028-10-19 21:09",
+        unlockedAuthor: "External Evaluation Team",
+        unlockedContent: `[FIELD TEST SUMMARY]
+
+Controlled exposure was no longer considered sufficient to model outbreak behavior across dispersed populations. A limited-release event was approved along under-monitored rural corridors using contaminated transport waste and transient carriers with no direct ties to the research facilities.
+
+The goal was to observe whether the strain could establish itself in communities lacking immediate medical response or centralized reporting. It did.
+
+Hosts remained mobile long enough to spread behavioral destabilization into nearby settlements before civil authorities recognized a common pattern. By the time armed response units entered the affected villages, most local narratives had already been shaped around isolated violence, drug hysteria, or animal attacks.
+
+Site designation: <span class="redacted">GRID REFERENCE SCRUBBED</span>
+Civilian outcome estimate: <span class="corrupt">DATA CORRUPTED</span>
+
+Conclusion entered in final section:
+"Field viability confirmed. Panic response can be delayed if outbreak signatures are fragmented across rural populations."`
+      },
+
+      sponsorMemo: {
+        title: "SPONSOR_MEMO_LOCKED",
+        path: "ROOT/CLASSIFIED/SPONSOR_MEMO",
+        date: "Recovered Timestamp: ACCESS DENIED",
+        author: "System",
+        lockedContent: `[ACCESS DENIED]
+
+This archive segment requires executive sponsor key authorization.
+
+Visible metadata fragments:
+- accelerated timetable
+- private procurement
+- immunity from audit
+- results before quarter close
+
+<span class="danger">ERROR: SPONSOR KEY INVALID OR MISSING</span>`,
+        unlockedTitle: "SPONSOR_MEMO.sys",
+        unlockedDate: "Recovered Timestamp: 2028-10-11 12:42",
+        unlockedAuthor: "Executive Liaison Office",
+        unlockedContent: `[SPONSOR MEMORANDUM]
+
+To all project leads: timelines are not negotiable. The backers underwriting HV-13 are dissatisfied with repeated cautionary delays and have made it clear that deliverables must move from theory to demonstrable field relevance. Ethical review committees will not be consulted on this phase. Their purpose is optics, not progress.
+
+Any research lead unable to support accelerated implementation will be replaced. Any documentation likely to complicate continuation funding is to be summarized, sanitized, or routed into restricted annexes unavailable to standard audit staff.
+
+Sponsor identities: <span class="redacted">THREE NAMES REMOVED BY EXECUTIVE ORDER</span>
+Procurement channel: <span class="corrupt">BROKEN RECORD / SEE ANNEX ██-7</span>
+
+Remember the priority: survivable aggression control, host persistence, and scalable destabilization. The sponsors are not paying for treatment. They are paying for certainty.`
+      },
+
+      continuityDirective: {
+        title: "STATE_CONTINUITY_LOCKED",
+        path: "ROOT/CLASSIFIED/STATE_CONTINUITY",
+        date: "Recovered Timestamp: ACCESS DENIED",
+        author: "System",
+        lockedContent: `[ACCESS DENIED]
+
+This archive segment requires continuity cabinet key authentication.
+
+Indexed but unreadable references:
+- media narrative control
+- evacuation tiering
+- abandonment protocol
+- sacrificial quarantine zones
+
+<span class="danger">ERROR: CONTINUITY AUTHORIZATION FAILED</span>`,
+        unlockedTitle: "STATE_CONTINUITY.sys",
+        unlockedDate: "Recovered Timestamp: 2028-10-27 05:58",
+        unlockedAuthor: "Continuity Cabinet / Emergency Secretariat",
+        unlockedContent: `[STATE CONTINUITY DIRECTIVE]
+
+Preservation of government continuity supersedes preservation of population confidence. Regional sacrifice may be required to prevent national fragmentation. In the event that containment cannot be restored, selected population centers are to remain sealed long enough to preserve evacuation lanes for executive personnel, foreign envoys, defense archives, and strategic technical staff.
+
+Broadcast language is to emphasize temporary quarantine, ongoing relief coordination, and localized disturbances. Under no circumstances is the origin of the pathogen to be discussed in public channels. Any leak suggesting state complicity is to be treated as destabilization propaganda regardless of factual basis.
+
+Priority evacuation list: <span class="redacted">CABINET / DEFENSE LIAISONS / FOREIGN ASSETS / TIER OMEGA PERSONNEL</span>
+Population designation for hold zones: <span class="corrupt">UNRECOVERABLE TEXT STREAM</span>
+
+Final contingency clause:
+"If public order cannot be maintained, legitimacy will be preserved through narrative continuity rather than territorial control."`
       }
     };
 
@@ -431,8 +1204,9 @@ Final surviving line from the archive:
       {
         name: "RESEARCH",
         children: [
-          { type: "file", key: "projectBlackStrain", label: "PROJECT_BLACK_STRAIN.txt" },
-          { type: "file", key: "mutationReport", label: "MUTATION_REPORT.txt" }
+          { type: "file", key: "hv13Origin", label: "PROJECT_HV13_ORIGIN.txt" },
+          { type: "file", key: "mutationReport", label: "MUTATION_REPORT.txt" },
+          { type: "file", key: "hostExperiment", label: "HOST_EXPERIMENT_LOG.txt", locked: true }
         ]
       },
       {
@@ -446,7 +1220,8 @@ Final surviving line from the archive:
         name: "MEDICAL_DATA",
         children: [
           { type: "file", key: "symptoms", label: "SYMPTOMS.txt" },
-          { type: "file", key: "infectionStages", label: "INFECTION_STAGES.txt" }
+          { type: "file", key: "infectionStages", label: "INFECTION_STAGES.txt" },
+          { type: "file", key: "patientAudio01", label: "PATIENT_AUDIO_01.wav" }
         ]
       },
       {
@@ -459,7 +1234,10 @@ Final surviving line from the archive:
       {
         name: "CLASSIFIED",
         children: [
-          { type: "file", key: "restricted", label: "OMEGA_ARCHIVE.sys", locked: true }
+          { type: "file", key: "restricted", label: "OMEGA_ARCHIVE.sys", locked: true },
+          { type: "file", key: "fieldTesting", label: "FIELD_TEST_RESULTS.sys", locked: true },
+          { type: "file", key: "sponsorMemo", label: "SPONSOR_MEMO.sys", locked: true },
+          { type: "file", key: "continuityDirective", label: "STATE_CONTINUITY.sys", locked: true }
         ]
       }
     ];
@@ -468,6 +1246,10 @@ Final surviving line from the archive:
     const fileTitle = document.getElementById("fileTitle");
     const fileMeta = document.getElementById("fileMeta");
     const terminalOutput = document.getElementById("terminalOutput");
+    const audioPanel = document.getElementById("audioPanel");
+    const audioPlayer = document.getElementById("audioPlayer");
+    const audioSource = document.getElementById("audioSource");
+    const audioDescription = document.getElementById("audioDescription");
     const passkeyModal = document.getElementById("passkeyModal");
     const passkeyInput = document.getElementById("passkeyInput");
     const passkeyMessage = document.getElementById("passkeyMessage");
@@ -482,10 +1264,12 @@ Final surviving line from the archive:
         if (item.type === "file") {
           const li = document.createElement("li");
           const btn = document.createElement("button");
+
           btn.className = "file-btn" + (item.locked ? " locked" : "");
           btn.textContent = item.label;
           btn.dataset.key = item.key;
           btn.addEventListener("click", () => openFile(item.key, btn));
+
           li.appendChild(btn);
           parent.appendChild(li);
           return;
@@ -508,56 +1292,60 @@ Final surviving line from the archive:
       });
     }
 
+    function prepareTypingMarkup(htmlText) {
+      return htmlText
+        .replace(/<span class="redacted">([\s\S]*?)<\/span>/g, (_, text) => `@@REDSTART@@${text}@@REDEND@@`)
+        .replace(/<span class="danger">([\s\S]*?)<\/span>/g, (_, text) => `@@DANGERSTART@@${text}@@DANGEREND@@`)
+        .replace(/<span class="corrupt">([\s\S]*?)<\/span>/g, (_, text) => `@@CORRUPTSTART@@${text}@@CORRUPTEND@@`)
+        .replace(/<span class="corrupt-block">([\s\S]*?)<\/span>/g, (_, text) => `@@CORRUPTBLOCKSTART@@${text}@@CORRUPTBLOCKEND@@`);
+    }
+
+    function finalizeTypingMarkup(text) {
+      return text
+        .replace(/@@REDSTART@@([\s\S]*?)@@REDEND@@/g, '<span class="redacted">$1</span>')
+        .replace(/@@DANGERSTART@@([\s\S]*?)@@DANGEREND@@/g, '<span class="danger">$1</span>')
+        .replace(/@@CORRUPTSTART@@([\s\S]*?)@@CORRUPTEND@@/g, '<span class="corrupt">$1</span>')
+        .replace(/@@CORRUPTBLOCKSTART@@([\s\S]*?)@@CORRUPTBLOCKEND@@/g, '<span class="corrupt-block">$1</span>')
+        .replace(/\n/g, "<br>");
+    }
+
     function typeText(target, htmlText, speed = 10) {
       clearTimeout(typingTimer);
       target.innerHTML = "<span class='typing'></span>";
       const typingSpan = target.querySelector(".typing");
 
-      const stripped = htmlText
-        .replace(/<span class=\"danger\">/g, "")
-        .replace(/<\/span>/g, "");
-
+      const prepared = prepareTypingMarkup(htmlText);
       let index = 0;
 
       function step() {
-        const currentText = stripped.slice(0, index);
-        typingSpan.innerHTML = currentText.replace(/\n/g, "<br>");
-
-        if (htmlText.includes("<span class=\"danger\">")) {
-          typingSpan.innerHTML = typingSpan.innerHTML.replace(
-            "ERROR: USER CREDENTIALS INSUFFICIENT",
-            '<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>'
-          );
-        }
+        const currentText = prepared.slice(0, index);
+        typingSpan.innerHTML = finalizeTypingMarkup(currentText);
 
         index += 2;
-        if (index <= stripped.length) {
+        if (index <= prepared.length) {
           typingTimer = setTimeout(step, speed);
         } else {
-          target.innerHTML = currentText.replace(/\n/g, "<br>");
-          if (htmlText.includes("<span class=\"danger\">")) {
-            target.innerHTML = target.innerHTML.replace(
-              "ERROR: USER CREDENTIALS INSUFFICIENT",
-              '<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>'
-            );
-          }
+          target.innerHTML = finalizeTypingMarkup(prepared);
         }
       }
 
       step();
     }
 
-    function showPasskeyModal(btn) {
+    function showPasskeyModal(key, btn) {
       passkeyModal.style.display = "flex";
       passkeyMessage.textContent = "";
       passkeyInput.value = "";
       passkeyInput.focus();
+
       submitPasskey.onclick = () => {
-        const attempt = passkeyInput.value.trim();
-        if (attempt.toUpperCase() === CLASSIFIED_PASSKEY) {
-          classifiedUnlocked = true;
+        const attempt = passkeyInput.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+        const expected = (CLASSIFIED_PASSKEYS[key] || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+        if (attempt === expected) {
+          unlockedFiles.add(key);
           passkeyModal.style.display = "none";
-          openFile("restricted", btn, true);
+          openFile(key, btn, true);
         } else {
           passkeyMessage.textContent = "ACCESS DENIED // INVALID PASSKEY";
         }
@@ -584,23 +1372,54 @@ Final surviving line from the archive:
       const file = files[key];
       if (!file) return;
 
-      if (key === "restricted" && !classifiedUnlocked && !bypassPrompt) {
-        showPasskeyModal(btn);
+      const isClassified = Object.prototype.hasOwnProperty.call(CLASSIFIED_PASSKEYS, key);
+      const isUnlocked = unlockedFiles.has(key);
+
+      if (isClassified && !isUnlocked && !bypassPrompt) {
+        showPasskeyModal(key, btn);
         return;
       }
 
-      if (activeButton) activeButton.classList.remove("active");
+      if (activeButton) {
+        activeButton.classList.remove("active");
+      }
+
       if (btn) {
         btn.classList.add("active");
         activeButton = btn;
       }
 
-      const isUnlockedRestricted = key === "restricted" && classifiedUnlocked;
-      fileTitle.textContent = isUnlockedRestricted ? file.unlockedTitle : file.title;
-      fileMeta.textContent = `${file.path}
-${isUnlockedRestricted ? file.unlockedDate : file.date}
-Author: ${isUnlockedRestricted ? file.unlockedAuthor : file.author}`;
-      typeText(terminalOutput, isUnlockedRestricted ? file.unlockedContent : (file.lockedContent || file.content), 8);
+      const showUnlockedView = isClassified && isUnlocked;
+      const activeContent = showUnlockedView
+        ? file.unlockedContent
+        : (file.lockedContent || file.content);
+
+      fileTitle.textContent = showUnlockedView ? file.unlockedTitle : file.title;
+      fileMeta.textContent =
+        `${file.path}\n${showUnlockedView ? file.unlockedDate : file.date}\nAuthor: ${showUnlockedView ? file.unlockedAuthor : file.author}`;
+
+      const activeAudioSrc = showUnlockedView
+        ? (file.unlockedAudioSrc || file.audioSrc)
+        : file.audioSrc;
+
+      const activeAudioDescription = showUnlockedView
+        ? (file.unlockedAudioDescription || file.audioDescription)
+        : file.audioDescription;
+
+      if (activeAudioSrc) {
+        audioPanel.classList.add("active");
+        audioDescription.textContent = activeAudioDescription || "Recovered archive audio.";
+        audioSource.src = activeAudioSrc;
+        audioPlayer.load();
+      } else {
+        audioPanel.classList.remove("active");
+        audioPlayer.pause();
+        audioSource.src = "";
+        audioPlayer.load();
+        audioDescription.textContent = "";
+      }
+
+      typeText(terminalOutput, activeContent, 8);
     }
 
     renderTree(treeData, treeRoot);
