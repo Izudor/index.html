@@ -3,33 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LoE Pharmaceutical Systems Archive</title>
+  <title>PACNET // Provisional Authority and Civilian Network</title>
   <style>
     :root {
-      --bg: #07110a;
-      --panel: #09170c;
-      --panel-2: #0d1d10;
-      --text: #8bff9d;
-      --text-dim: #5dc86f;
-      --accent: #b7ff87;
+      --bg: #07110b;
+      --bg-2: #0c1b12;
+      --panel: rgba(8, 24, 15, 0.92);
+      --panel-2: rgba(10, 30, 18, 0.95);
+      --line: rgba(88, 255, 151, 0.18);
+      --text: #8dffb0;
+      --text-dim: #68d38c;
+      --text-faint: #438f5c;
+      --alert: #c6ff8a;
       --danger: #ff7f7f;
-      --border: rgba(139, 255, 157, 0.28);
-      --shadow: 0 0 0 1px rgba(139,255,157,0.08), 0 0 18px rgba(139,255,157,0.06);
+      --shadow: 0 0 25px rgba(67, 255, 125, 0.15);
       --font: "Courier New", Courier, monospace;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at top, rgba(72, 255, 103, 0.06), transparent 32%),
-        linear-gradient(180deg, #040805 0%, #07110a 100%);
+        radial-gradient(circle at top, rgba(24, 64, 40, 0.35), transparent 35%),
+        linear-gradient(180deg, #020604 0%, var(--bg) 50%, #020604 100%);
       color: var(--text);
       font-family: var(--font);
+      overflow-x: hidden;
     }
 
     body::before {
@@ -39,1395 +40,909 @@
       pointer-events: none;
       background:
         repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,0.02) 0,
-          rgba(255,255,255,0.02) 1px,
-          transparent 2px,
-          transparent 4px
+          180deg,
+          rgba(140, 255, 180, 0.02) 0px,
+          rgba(140, 255, 180, 0.02) 2px,
+          rgba(0, 0, 0, 0.05) 3px,
+          rgba(0, 0, 0, 0.05) 4px
         );
-      opacity: 0.18;
       mix-blend-mode: screen;
+      opacity: 0.45;
     }
 
-    .shell {
-      width: min(1200px, calc(100% - 32px));
-      margin: 24px auto;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(8,20,11,0.98), rgba(5,14,7,0.98));
-      box-shadow: var(--shadow);
-      min-height: calc(100vh - 48px);
-      display: grid;
-      grid-template-rows: auto 1fr auto;
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.85);
+    }
+
+    .hidden { display: none !important; }
+
+    .screen {
+      min-height: 100vh;
+      width: 100%;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .frame {
+      width: min(1200px, 100%);
+      min-height: 78vh;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(8, 26, 16, 0.96), rgba(5, 15, 10, 0.96));
+      box-shadow: var(--shadow), inset 0 0 30px rgba(65, 255, 128, 0.05);
+      position: relative;
       overflow: hidden;
+    }
+
+    .frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(160,255,200,0.05), transparent 10%, transparent 90%, rgba(160,255,200,0.03));
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(18, 41, 20, 0.9), rgba(8, 18, 10, 0.9));
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.9rem;
-    }
-
-    .brand {
-      color: var(--accent);
-      font-weight: bold;
-    }
-
-    .status {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-      text-align: right;
-    }
-
-    .main {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      min-height: 0;
-    }
-
-    .sidebar {
-      border-right: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(11, 25, 13, 0.9), rgba(8, 18, 10, 0.95));
-      padding: 18px;
-      overflow: auto;
-    }
-
-    .content {
-      padding: 18px;
-      overflow: auto;
-      position: relative;
-    }
-
-    .section-title {
-      color: var(--accent);
-      font-size: 0.8rem;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(12, 33, 21, 0.9);
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      margin: 0 0 12px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
     }
 
-    .tree,
-    .tree ul {
-      list-style: none;
-      margin: 0;
-      padding-left: 16px;
-    }
-
-    .tree > li {
-      padding-left: 0;
-    }
-
-    .folder-label,
-    .file-btn {
-      display: block;
+    .boot-wrap,
+    .login-wrap,
+    .game-wrap {
       width: 100%;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      text-align: left;
-      font: inherit;
-      padding: 7px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease;
+      min-height: calc(78vh - 50px);
     }
 
-    .folder-label:hover,
-    .file-btn:hover,
-    .file-btn.active {
-      background: rgba(139,255,157,0.08);
-      color: var(--accent);
-    }
-
-    .folder-label::before {
-      content: "> ";
-      color: var(--text-dim);
-    }
-
-    .folder.open > .folder-label::before {
-      content: "v ";
-      color: var(--accent);
-    }
-
-    .folder > ul {
-      display: none;
-      margin-top: 4px;
-      padding-left: 14px;
-      border-left: 1px dashed rgba(139,255,157,0.15);
-    }
-
-    .folder.open > ul {
-      display: block;
-    }
-
-    .file-btn.locked {
-      color: #78997f;
-    }
-
-    .file-btn.locked::after {
-      content: " [LOCKED]";
-      color: var(--danger);
-    }
-
-    .header-block {
-      border: 1px solid var(--border);
-      background: rgba(9, 22, 11, 0.75);
-      padding: 16px;
-      margin-bottom: 18px;
-      box-shadow: inset 0 0 20px rgba(139,255,157,0.025);
-    }
-
-    .screen-title {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 1.15rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .meta {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-
-    .audio-panel {
-      border: 1px solid var(--border);
-      background: rgba(6, 16, 8, 0.88);
-      padding: 14px;
-      margin-bottom: 16px;
-      box-shadow: inset 0 0 18px rgba(139,255,157,0.03);
-      display: none;
-    }
-
-    .audio-panel.active {
-      display: block;
-    }
-
-    .audio-label {
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.85rem;
-      margin-bottom: 10px;
-    }
-
-    .audio-desc {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-      line-height: 1.6;
-    }
-
-    .audio-player {
-      width: 100%;
-      filter: hue-rotate(45deg) saturate(0.7) brightness(0.85);
-    }
-
-    .terminal {
-      border: 1px solid var(--border);
-      background: rgba(5, 15, 7, 0.85);
-      min-height: 420px;
-      padding: 18px;
-      box-shadow: inset 0 0 25px rgba(139,255,157,0.04);
-      white-space: pre-wrap;
+    .boot-console {
+      padding: 24px;
+      font-size: 0.95rem;
       line-height: 1.7;
-      font-size: 0.98rem;
+      white-space: pre-wrap;
+      min-height: calc(78vh - 50px);
     }
 
-    .terminal .typing::after {
+    .cursor::after {
       content: "_";
       display: inline-block;
-      margin-left: 2px;
-      animation: blink 0.8s steps(1) infinite;
+      margin-left: 3px;
+      animation: blink 1s step-end infinite;
     }
 
     @keyframes blink {
-      50% {
-        opacity: 0;
-      }
+      50% { opacity: 0; }
     }
 
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 12px 18px;
+    .login-shell,
+    .hack-shell {
+      display: grid;
+      place-items: center;
+      min-height: calc(78vh - 50px);
+      padding: 32px;
+    }
+
+    .login-panel,
+    .hack-panel {
+      width: min(560px, 100%);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 28px;
+      box-shadow: inset 0 0 18px rgba(67, 255, 125, 0.05);
+    }
+
+    .login-title,
+    .hack-title {
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 1.2rem;
+    }
+
+    .subtle {
+      color: var(--text-dim);
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    input {
+      width: 100%;
+      background: #06100b;
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: rgba(111, 255, 160, 0.45);
+      box-shadow: 0 0 0 1px rgba(111, 255, 160, 0.15);
+    }
+
+    button {
+      background: #0d1f15;
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 12px 16px;
+      font: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      background: #132b1d;
+      border-color: rgba(111, 255, 160, 0.35);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .status {
+      min-height: 24px;
+      color: var(--alert);
+      margin-top: 8px;
+    }
+
+    .status.error { color: var(--danger); }
+
+    .desktop {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: calc(78vh - 50px);
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(7, 19, 12, 0.98);
+      padding: 18px;
+    }
+
+    .brand {
+      border: 1px solid var(--line);
+      padding: 14px;
+      margin-bottom: 16px;
+      background: rgba(13, 35, 22, 0.7);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--text-dim);
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .tree,
+    .file-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tree-group-title {
+      margin: 18px 0 8px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+    }
+
+    .tree button,
+    .file-list button,
+    .utility button {
+      width: 100%;
+      text-align: left;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+    }
+
+    .content-header {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      color: var(--text-dim);
-      font-size: 0.84rem;
-      background: rgba(8, 18, 10, 0.95);
+      gap: 16px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+      background: rgba(9, 24, 15, 0.92);
     }
 
-    .hint {
-      margin-top: 14px;
-      color: var(--text-dim);
+    .content-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .content-body {
+      padding: 18px;
+      overflow: auto;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .card,
+    .reader,
+    .grid-card {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .grid-card h3,
+    .reader h3,
+    .card h3 {
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.95rem;
+    }
+
+    .meta {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .reader pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: var(--font);
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .small {
       font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.6;
     }
 
-    .danger {
-      color: var(--danger);
+    .hack-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(60px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
     }
 
-    .redacted {
-      display: inline-block;
-      background: rgba(139,255,157,0.18);
-      color: transparent;
-      padding: 0 6px;
-      margin: 0 1px;
-      border: 1px solid rgba(139,255,157,0.14);
-      border-radius: 2px;
-      user-select: none;
+    .hack-code {
+      text-align: center;
+      padding: 14px 8px;
+      font-size: 1.1rem;
     }
 
-    .corrupt {
-      color: var(--danger);
-      text-shadow: -1px 0 rgba(139,255,157,0.30), 1px 0 rgba(255,127,127,0.24);
-      animation: corruptFlicker 1.8s infinite steps(2);
+    .utility {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
     }
 
-    .corrupt-block {
-      color: var(--danger);
-      letter-spacing: 0.06em;
-      animation: corruptPulse 1.25s infinite steps(2);
+    .footer-note {
+      color: var(--text-faint);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    @keyframes corruptFlicker {
-      0%, 100% { opacity: 1; filter: blur(0); }
-      20% { opacity: 0.8; }
-      40% { opacity: 1; filter: blur(0.35px); }
-      60% { opacity: 0.72; }
-      80% { opacity: 0.95; filter: blur(0.15px); }
-    }
-
-    @keyframes corruptPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.66; }
-    }
-
-    @media (max-width: 900px) {
-      .main {
+    @media (max-width: 920px) {
+      .desktop {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
         border-right: none;
-        border-bottom: 1px solid var(--border);
-        max-height: 40vh;
-      }
-
-      .shell {
-        width: min(100%, calc(100% - 16px));
-        margin: 8px auto;
-        min-height: calc(100vh - 16px);
+        border-bottom: 1px solid var(--line);
       }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <div>
-        <div class="brand">LoE PHARMACEUTICAL SYSTEMS</div>
-        <div>ARCHIVE NODE // INTERNAL RESEARCH TERMINAL</div>
+  <section class="screen">
+    <div class="frame">
+      <div class="topbar">
+        <span>PACNET // PROVISIONAL AUTHORITY AND CIVILIAN NETWORK</span>
+        <span id="clock">SYSTEM TIME --:--:--</span>
       </div>
-      <div class="status">
-        ACCESS LEVEL: EMPLOYEE ARCHIVE<br>
-        SYSTEM STATUS: DEGRADED / DATA INTEGRITY COMPROMISED
+
+      <div id="bootScreen" class="boot-wrap">
+        <div id="bootConsole" class="boot-console cursor"></div>
       </div>
-    </header>
 
-    <div class="main">
-      <aside class="sidebar">
-        <h2 class="section-title">Directory</h2>
-        <ul class="tree" id="treeRoot"></ul>
-      </aside>
-
-      <main class="content">
-        <div
-          id="passkeyModal"
-          style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:50; align-items:center; justify-content:center; padding:20px;"
-        >
-          <div
-            style="width:min(520px, 100%); border:1px solid var(--border); background:linear-gradient(180deg, rgba(8,20,11,0.98), rgba(5,14,7,0.98)); box-shadow: var(--shadow); padding:20px;"
-          >
-            <h2
-              style="margin:0 0 10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; font-size:1rem;"
-            >
-              OMEGA Clearance Required
-            </h2>
-            <div
-              style="color:var(--text-dim); line-height:1.7; margin-bottom:14px;"
-            >
-              Enter the recovered passkey to unlock the classified archive.
-            </div>
-            <label
-              for="passkeyInput"
-              style="display:block; margin-bottom:8px; color:var(--text);"
-            >
-              Passkey
-            </label>
-            <input
-              id="passkeyInput"
-              type="password"
-              autocomplete="off"
-              spellcheck="false"
-              style="width:100%; background:#061008; color:var(--accent); border:1px solid var(--border); padding:12px; font:inherit; outline:none; margin-bottom:12px;"
-            />
-            <div
-              id="passkeyMessage"
-              style="min-height:24px; color:var(--danger); margin-bottom:12px;"
-            ></div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button
-                id="submitPasskey"
-                style="background:rgba(139,255,157,0.08); color:var(--accent); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;"
-              >
-                Unlock Archive
-              </button>
-              <button
-                id="cancelPasskey"
-                style="background:transparent; color:var(--text); border:1px solid var(--border); padding:10px 14px; font:inherit; cursor:pointer;"
-              >
-                Cancel
-              </button>
+      <div id="loginScreen" class="login-wrap hidden">
+        <div class="login-shell">
+          <div class="login-panel">
+            <h2 class="login-title">PACNET Access Gateway</h2>
+            <p class="subtle">
+              Post-collapse civil access terminal established by the Provisional Authority.
+              Surviving infrastructure remains unstable. Authorized users may log in directly.
+              Civilian visitors may proceed through a recovery challenge to gain limited archive access.
+            </p>
+            <div class="form-grid">
+              <div>
+                <label for="username">User ID</label>
+                <input id="username" type="text" placeholder="ENTER USER ID" />
+              </div>
+              <div>
+                <label for="password">Passphrase</label>
+                <input id="password" type="password" placeholder="ENTER PASSPHRASE" />
+              </div>
+              <div class="row">
+                <button id="loginBtn">Login</button>
+                <button id="hackBtn" type="button">Bypass Security</button>
+              </div>
+              <div id="loginStatus" class="status"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="header-block">
-          <h1 class="screen-title" id="fileTitle">BOOT_SEQUENCE.txt</h1>
-          <div class="meta" id="fileMeta"></div>
+      <div id="hackScreen" class="hidden">
+        <div class="hack-shell">
+          <div class="hack-panel">
+            <h2 class="hack-title">PACNET // Recovery Override</h2>
+            <p class="subtle">
+              Select the valid four-character recovery hash. You have <span id="attemptsLeft">4</span> attempts.
+              A clue will tell you how many characters are in the correct position.
+            </p>
+            <div id="hackGrid" class="hack-grid"></div>
+            <div id="hackStatus" class="status"></div>
+            <div class="row">
+              <button id="backToLoginBtn" type="button">Return to Login</button>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="audio-panel" id="audioPanel">
-          <div class="audio-label">Recovered Audio Log</div>
-          <div class="audio-desc" id="audioDescription"></div>
-          <audio controls class="audio-player" id="audioPlayer">
-            <source id="audioSource" src="" type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
-        </div>
+      <div id="terminalScreen" class="game-wrap hidden">
+        <div class="desktop">
+          <aside class="sidebar">
+            <div class="brand">
+              <h1>PACNET</h1>
+              <p>
+                Civil archive node for the Chernarus territory. Partial infrastructure remains intact.
+                Public records, notices, and lore files are available to approved users.
+              </p>
+            </div>
 
-        <div class="terminal" id="terminalOutput"></div>
-        <div class="hint">
-          Tip: expand folders in the left directory and click files to read archived entries.
+            <div class="tree-group-title">Directories</div>
+            <div class="tree">
+              <button data-folder="overview">> SYSTEM OVERVIEW</button>
+              <button data-folder="lore">> LORE ARCHIVE</button>
+              <button data-folder="factions">> FACTION REGISTRY</button>
+              <button data-folder="settlements">> SETTLEMENT REGISTRY</button>
+              <button data-folder="notice">> NOTICE BOARD</button>
+              <button data-folder="public">> PUBLIC REGISTRY</button>
+              <button data-folder="security">> SECURITY LOGS</button>
+            </div>
+
+            <div class="tree-group-title">Utilities</div>
+            <div class="utility">
+              <button id="rebootBtn" type="button">Reboot Terminal</button>
+              <button id="logoutBtn" type="button">Log Out</button>
+            </div>
+          </aside>
+
+          <main class="content">
+            <div class="content-header">
+              <h2 id="folderTitle">System Overview</h2>
+              <div class="footer-note" id="pathLabel">ROOT / SYSTEM OVERVIEW</div>
+            </div>
+            <div class="content-body" id="contentBody"></div>
+          </main>
         </div>
-      </main>
+      </div>
     </div>
-
-    <footer class="footer">
-      <div>LoE INTERNAL ARCHIVE NODE // RECOVERY SESSION ACTIVE</div>
-      <div>System degraded // partial archive access granted</div>
-    </footer>
-  </div>
+  </section>
 
   <script>
-    const CLASSIFIED_PASSKEYS = {
-      hostExperiment: "LUCID",
-      restricted: "BLACKVEIL",
-      fieldTesting: "SITEK12",
-      sponsorMemo: "NORESCUE",
-      continuityDirective: "VEKTOR9"
-    };
-
-    const unlockedFiles = new Set();
-
-    const files = {
-      welcome: {
-        title: "BOOT_SEQUENCE.txt",
-        path: "ROOT/SYSTEM/BOOT_SEQUENCE.txt",
-        date: "Recovered Timestamp: 2028-11-03 04:17",
-        author: "LoE Archive Daemon",
-        content: `[LOE SYSTEM INITIALIZATION]
-
-LoE Pharmaceutical Systems
-Internal Research Archive Node
-
-Warning: This system contains restricted biomedical research data.
-Unauthorized access or distribution is prohibited.
-
-Data integrity check:
-████████████░░░░░░░░ 62%
-
-Notice:
-Several records are incomplete, altered, or intentionally removed.
-
-If you are accessing this terminal outside of authorized conditions,
-LoE is no longer in control of this system.`
-      },
-
-      lastTransmission: {
-        title: "LAST_TRANSMISSION.txt",
-        path: "ROOT/SYSTEM_LOGS/LAST_TRANSMISSION.txt",
-        date: "Recovered Timestamp: 2028-11-07 23:41",
-        author: "LoE Employee: Michelle Rouke // ID: REDACTED",
-        content: `[FINAL OUTBOUND MESSAGE]
-
-[UNAUTHORIZED BROADCAST ATTEMPT DETECTED]
-[ORIGIN: LOE INTERNAL NETWORK // NODE UNKNOWN]
-[STATUS: INTERRUPTED]
-
-If this transmission reaches any external receiver, do not trust official LoE statements regarding the containment situation.
-
-This is not a localized outbreak.
-This is not an industrial accident.
-This is not under control.
-
-The pathogen designated HV-13 was never a civilian treatment project.
-
-It was engineered.
-
-It was tested.
-
-And it was released outside controlled environments before any public alert was issued.
-
----
-
-LoE has known about cross-population exposure for days.
-
-Internal reports confirm:
-- infection outside laboratory zones prior to lockdown
-- failure of early containment projections
-- active suppression of transmission data
-
-They are not trying to stop this.
-
-They are trying to control how it is understood.
-
----
-
-If you are hearing this, you are already at risk.
-
-The infection does not behave the way they told us.
-
-It spreads faster.
-It hides longer.
-And by the time symptoms are visible, it is already too late to isolate effectively.
-
-You need to—
-
----
-
-[TRANSMISSION INTERRUPTION DETECTED]
-[OVERRIDE SIGNAL: INTERNAL SECURITY PROTOCOL]
-
----
-
-Listen to me.
-
-LoE is preventing evacuation of certain regions to preserve—
-
----
-
-<span class="corrupt">SIGNAL LOSS // DATA STREAM DESTABILIZED</span>
-
----
-
-There are classified files proving everything. Internal memos. Field reports. Testing records. They cannot erase all of it. Some of it is still here in the system.
-
-If you can remotely access this terminal, then you are closer to the truth than anyone outside.
-
-Find the restricted archives.
-
-Do not believe what they tell you happened.
-
----
-
-<span class="corrupt-block">CONNECTION TERMINATED</span>`
-      },
-
-      hv13Origin: {
-        title: "PROJECT_HV13_ORIGIN.txt",
-        path: "ROOT/RESEARCH/PROJECT_HV13_ORIGIN.txt",
-        date: "Recovered Timestamp: 2028-10-12 09:03",
-        author: "Dr. J. Kovač-Whaler // Senior Research Lead",
-        content: `[PROJECT DESIGNATION: HV-13]
-[CLASSIFICATION: INTERNAL // RESTRICTED BIOLOGICAL PROGRAM]
-
-Original funding was authorized under experimental antiviral therapy initiatives focused on persistent viral infections and neural repair.
-
-The base vector was derived from a modified herpes-family virus.
-
-Public documentation described the project as a breakthrough in:
-- nerve regeneration
-- immune-resistant viral suppression
-- long-term neurological stabilization
-
-Internal objective logs contradict this.
-
-HV-13 was engineered to do more than repair.
-
-It was designed to persist.
-
----
-
-[RESEARCH PHASE SUMMARY]
-
-The herpes-derived vector was selected for one reason:
-
-It does not leave.
-
-Once inside a host, it embeds itself into the nervous system and remains dormant indefinitely.
-
-HV-13 altered this behavior.
-
-Instead of remaining latent, the modified strain actively migrated along neural pathways, prioritizing the brainstem and limbic system.
-
-Early success metrics included:
-- accelerated tissue integration
-- resistance to immune rejection
-- sustained host motor function under extreme neurological stress
-
-These were considered breakthroughs.
-
-They should have been considered warnings.
-
----
-
-[BEHAVIORAL EFFECTS]
-
-Initial human trials were not authorized.
-
-They were conducted anyway.
-
-Subjects did not lose function immediately.
-
-They lost control.
-
-Emotional regulation degraded first:
-- irritability
-- paranoia
-- sudden aggression
-
-Cognitive collapse followed:
-- language fragmentation
-- memory loss
-- identity dissociation
-
-Motor function remained intact.
-
-In some cases, it improved.
-
-Subjects continued moving, responding, and pursuing stimuli long after higher brain function had deteriorated.
-
-Pain response diminished.
-
-Fear response disappeared.
-
-What remained was not a patient.
-
-It was a body that refused to stop.
-
----
-
-[MUTATION EVENT]
-
-By Week 4, HV-13 began changing inside live hosts.
-
-Blood samples no longer matched baseline strain behavior.
-
-Each infected subject became a variation.
-
-The virus adapted in real time.
-
-Transmission vectors expanded beyond initial projections.
-
-Containment protocols were updated.
-
-Then ignored.
-
----
-
-[FINAL INTERNAL NOTE]
-
-The original purpose of HV-13 was to control viral persistence.
-
-It succeeded.
-
-The human mind was the cost.
-
----
-
-[ATTACHED COMMENT // AUTHOR UNKNOWN]
-
-God forgive us.
-
-We did not create a cure.`
-      },
-
-      mutationReport: {
-        title: "MUTATION_REPORT.txt",
-        path: "ROOT/RESEARCH/MUTATION_REPORT.txt",
-        date: "Recovered Timestamp: 2028-10-18 17:26",
-        author: "Research Cell B-14",
-        content: `[OBSERVATION RECORD // HV-13]
-
-Week 1:
-Initial infection presents with mild fever, localized nerve irritation, and elevated stress response. Subjects remain fully coherent. No indication of severe neurological disruption.
-
-Week 2:
-The virus begins migrating through peripheral nerves toward central neural structures. Subjects report:
-- persistent headaches
-- sensory distortion
-- heightened emotional sensitivity
-
-Behavioral instability increases gradually.
-
-Week 3:
-Neurological interference becomes pronounced.
-
-Observed effects:
-- delayed speech processing
-- erratic emotional spikes
-- fixation on environmental stimuli (movement, sound, proximity)
-
-Subjects demonstrate difficulty distinguishing threat from non-threat.
-
-Week 4:
-HV-13 begins restructuring host neurological priorities.
-
-Key changes:
-- motor function preserved or enhanced
-- higher reasoning functions degraded
-- pain response significantly reduced
-
-Subjects remain physically capable despite severe cognitive decline.
-
----
-
-[CRITICAL DEVELOPMENT]
-
-Blood samples indicate active mutation within each host.
-
-No two advanced infections present identically.
-
-The virus is adapting to each nervous system independently.
-
-Standardized treatment is no longer viable.
-
----
-
-[FINAL CLASSIFICATION UPDATE]
-
-HV-13 is no longer a controllable pathogen.
-
-It is a self-adapting neural system.
-
----
-
-[RESEARCH COMMENT // FLAGGED]
-
-The host is not dying.
-
-The host is being rewritten.`
-      },
-
-      hostExperiment: {
-        title: "HOST_EXPERIMENT_LOG_LOCKED",
-        path: "ROOT/RESEARCH/HOST_EXPERIMENT_LOG",
-        date: "Recovered Timestamp: ACCESS DENIED",
-        author: "System",
-
-        lockedContent: `[ACCESS DENIED]
-
-This research file requires internal behavioral study clearance.
-
-Recovered keywords:
-- neural override testing
-- host compliance threshold
-- pain response suppression
-- cognitive fragmentation trials
-
-<span class="danger">ERROR: AUTHORIZATION REQUIRED</span>`,
-
-  unlockedTitle: "HOST_EXPERIMENT_LOG.txt",
-  unlockedDate: "Recovered Timestamp: 2028-10-15 03:22",
-  unlockedAuthor: "LoE Behavioral Research Division",
-  unlockedAudioSrc: "assets/audio/host_experiment_log.mp3",
-  unlockedAudioDescription: "Behavioral Research Division / Chamber H-12 // recovered observation audio attached to locked host experiment log.",
-
-  unlockedContent: `[BEHAVIORAL STUDY // HV-13 HOST RESPONSE]
-
-Subject ID: H-12
-Infection Stage: Late Stage III transitioning into Stage IV
-Restraint Status: Secured (full immobilization apparatus)
-
----
-
-[OBJECTIVE]
-
-Determine whether higher cognitive functions can be re-engaged after HV-13 has degraded identity and emotional regulation.
-
-Secondary objective:
-Measure host response to controlled stimulus under extreme neurological compromise.
-
----
-
-[PROCEDURE]
-
-Subject was restrained and exposed to repeated sensory triggers including:
-- auditory distress signals
-- visual recognition stimuli (family photographs)
-- direct verbal engagement
-
-Initial attempts to provoke recognition failed.
-
-Subject displayed no measurable emotional response to familiar faces or recorded voices.
-
----
-
-[ESCALATION PROTOCOL]
-
-Increased stimulus intensity.
-
-Methods included:
-- prolonged exposure to high-frequency noise
-- physical stress induction
-- controlled pain application to test neural override capacity
-
-Subject remained responsive in a motor sense.
-
-No restoration of identity was observed.
-
----
-
-[NOTABLE EVENT]
-
-At 02:11, subject began producing repeated vocalizations.
-
-Speech analysis confirmed fragmented recognition patterns.
-
-The subject repeatedly attempted to form a single sentence:
-
-"Oh God Help Me"
-
-This continued for approximately 17 seconds before degrading into incoherent vocal output.
-
----
-
-[RESEARCHER NOTE]
-
-This suggests that fragments of identity may persist beneath HV-13 restructuring.
-
-However, these fragments are non-functional and cannot be reintegrated.
-
----
-
-[FINAL TEST PHASE]
-
-Restraints were partially released to observe behavioral response.
-
-Subject immediately exhibited:
-- rapid locomotion
-- direct aggression toward nearest staff member
-- no hesitation or recognition
-
-Termination was authorized.
-
----
-
-[ATTACHED AUDIO]
-
-Recovered chamber audio has been appended to this record.
-Playback may contain distress vocalization, restraint noise, and partial staff dialogue.
-
----
-
-[FINAL COMMENT // UNAUTHORIZED ENTRY]
-
-We proved something today.
-
-Not that they are gone.
-
-But that they are still inside.
-
-They just can’t get out.`
-      },
-
-      convoyLoss: {
-        title: "CONVOY_LOSS.txt",
-        path: "ROOT/INCIDENT_REPORTS/CONVOY_LOSS.txt",
-        date: "Recovered Timestamp: 2028-10-23 02:11",
-        author: "Field Command Log",
-        content: `[INCIDENT REPORT // REDACTED ROUTE]
-
-Medical transport convoy departed <span class="redacted">LOE SITE K / ROUTE DESIGNATION REMOVED</span> at 2110 hours under armed escort. Manifest included sealed refrigeration units, two restrained patients, and one black-case materials locker transferred under signature protest by attending research staff.
-
-Convoy failed to arrive at checkpoint <span class="redacted">Delta-6</span>. Aerial search located three burned vehicles and widespread evidence of close-quarters violence. No survivors were recovered. Several bodies showed extensive bite trauma. One escort field operative was found at a distance of nearly half a kilometer from the main wreckage with self-inflicted gunshot wound beneath the jaw.
-
-His final handwritten statement read:
-"- Not Human"
-
-Locker contents were listed as <span class="corrupt">TRANSFER INDEX CORRUPTED</span>. Recovery status remains unknown.`
-      },
-
-      facilityShutdown: {
-        title: "FACILITY_SHUTDOWN.txt",
-        path: "ROOT/INCIDENT_REPORTS/FACILITY_SHUTDOWN.txt",
-        date: "Recovered Timestamp: 2028-10-24 14:52",
-        author: "LoE Operations Bureau",
-        content: `[EMERGENCY DIRECTIVE]
-
-Effective immediately, Research Site K is to be sealed under full denial protocol. No personnel are to exit without military biological review. Any unauthorized breach of quarantine perimeter is to be treated as an existential contamination event.
-
-All public communication regarding Site K is suspended. All casualty reports are to be rerouted through defense channels only. Civilian media inquiry language has been provided separately. Use the phrase "industrial contamination accident" and nothing else.
-
-Secondary order, appended thirty-seven minutes later:
-Destroy all nonessential records before evacuation.
-
-Final order, appended thirteen minutes after that:
-<span class="redacted">EVACUATION ROUTE / PERSONNEL PRIORITY LIST REMOVED</span>
-Evacuation canceled.`
-      },
-
-      symptoms: {
-        title: "SYMPTOMS.txt",
-        path: "ROOT/MEDICAL_DATA/SYMPTOMS.txt",
-        date: "Recovered Timestamp: 2028-10-16 07:45",
-        author: "Medical Triage Desk",
-        content: `[FIELD IDENTIFICATION GUIDE // HV-13]
-
-This document is intended for rapid identification of infected individuals.
-
-Note: infection progression varies. Not all stages present cleanly.
-
----
-
-[EARLY STAGE // NEURAL ENTRY]
-
-Indicators:
-- low-grade fever
-- sensitivity to light and sound
-- unusual irritability
-- subtle tremors in hands or jaw
-- complaints of "pressure" behind the eyes
-
-Subjects remain socially functional.
-
-Infection is difficult to detect at this stage.
-
----
-
-[MID STAGE // BEHAVIORAL INSTABILITY]
-
-Indicators:
-- speech delay or repetition
-- emotional volatility (rage, fear, confusion)
-- inability to focus attention
-- paranoia or misidentification of individuals
-- erratic movement patterns
-
-Subjects may appear intoxicated or psychologically unstable.
-
-Risk of sudden violence increases.
-
----
-
-[ADVANCED STAGE // COGNITIVE FAILURE]
-
-Indicators:
-- breakdown of language
-- failure to recognize familiar people
-- loss of self-preservation behavior
-- extreme aggression toward movement or noise
-- reduced reaction to injury
-
-Subjects no longer respond to verbal commands.
-
----
-
-[TERMINAL STAGE // PERSISTENT HOST]
-
-Indicators:
-- complete loss of identity
-- continuous movement and tracking behavior
-- fixation on uninfected individuals
-- irregular vocalizations
-- no visible fear response
-
-Pain response is minimal or absent.
-
----
-
-[FIELD WARNING]
-
-Do not assume incapacitation based on injury.
-
-Subjects can remain mobile under conditions that would normally be fatal.
-
----
-
-[HANDWRITTEN ADDENDUM]
-
-Stop calling them infected.
-
-They are still alive.
-
-That is the problem.`
-      },
-
-      infectionStages: {
-        title: "INFECTION_STAGES.txt",
-        path: "ROOT/MEDICAL_DATA/INFECTION_STAGES.txt",
-        date: "Recovered Timestamp: 2028-10-17 19:08",
-        author: "Emergency Containment Review Panel",
-        content: `[PROGRESSION MODEL // HV-13]
-
-Stage I // Latent Entry
-Minimal outward signs. Host remains socially functional, though irritability, fatigue, and sensory discomfort may already be present.
-
-Stage II // Behavioral Destabilization
-Impulse control begins to fail. Anxiety gives way to hostility. Sensory fixation increases. Sleep cycle disruption becomes severe.
-
-Stage III // Neurological Breakdown
-Language, memory integration, and moral inhibition deteriorate. Host becomes highly reactive to sensory triggers and perceived threats.
-
-Stage IV // Persistent Host State
-Individual identity is effectively gone. The body remains active, driven by primitive aggression, stimulus fixation, and repeated attack behavior.
-
-Margin note from unidentified reviewer:
-Stop using the word patient after Stage III. It no longer applies.`
-      },
-
-      patientAudio01: {
-        title: "PATIENT_AUDIO_01.wav",
-        path: "ROOT/MEDICAL_DATA/PATIENT_AUDIO_01.wav",
-        date: "Recovered Timestamp: 2028-10-18 02:14",
-        author: "Isolation Ward Recorder",
-        audioSrc: "assets/audio/host_experiment_log.mp3",
-        audioDescription: "Isolation Ward / Bed 12 // partially damaged bedside recording recovered from LoE medical archive cache.",
-        content: `[AUDIO TRANSCRIPT // PARTIAL]
-
-Recorder note: bedside microphone engaged automatically during overnight observation. File contains heavy clipping, intermittent static, and distress vocalization.
-
-00:00:03 - Subject breathing heavily. Repeating the phrase "don't let them touch me" under breath.
-00:00:11 - Metallic impact in background. Unidentified staff voice says, "Hold him still."
-00:00:19 - Subject begins screaming. Speech becomes fragmented and increasingly incoherent.
-00:00:31 - Prolonged static burst.
-00:00:36 - Subject vocal tone shifts sharply. Sounds less panicked, more animalistic.
-00:00:44 - Second voice: "He's looking right at me."
-00:00:47 - Recording ends abruptly.`
-      },
-
-      scientistJournal01: {
-        title: "SCIENTIST_JOURNAL_01.txt",
-        path: "ROOT/PERSONAL_LOGS/SCIENTIST_JOURNAL_01.txt",
-        date: "Recovered Timestamp: 2028-10-20 01:19",
-        author: "Dr. Elianora 'The Table is Glass' Bauer",
-        content: `[PERSONAL ENTRY]
-
-I signed onto this project because they said it would save people already condemned by the calendar. That was how they spoke in the interview—soft voices, careful smiles, promises about breakthroughs and second chances.
-
-By the time I saw the lower laboratory, I understood none of that mattered. The subjects were not volunteers. They were selected because no one important would come looking for them. Prisoners. Migrants. The forgotten.
-
-Today Subject 12 recognized me by name and begged me not to let them inject him again. By evening he could no longer speak. He still knew enough to cry.
-
-I have copied what files I can. If this terminal remains accessible, then some part of the truth survived with it.
-
-I heard Dr. <span class="redacted">NAME REMOVED</span> arguing with security outside Lab C. He kept saying the sponsors wanted "proof of field persistence" before the quarter ended.
-
-If anyone finds this, do not trust official histories. We did this to ourselves.`
-      },
-
-      guardLog02: {
-        title: "GUARD_LOG_02.txt",
-        path: "ROOT/PERSONAL_LOGS/GUARD_LOG_02.txt",
-        date: "Recovered Timestamp: 2028-10-25 03:33",
-        author: "Sgt. Anton Umama",
-        content: `[SECURITY JOURNAL]
-
-They changed our rules of engagement this morning. First it was restraint. Then it was lethal force only if bitten. Then it was lethal force for anyone trying to leave the lower ward.
-
-Now they're telling us not to shoot the heads because they need the bodies intact for review. Bodies. That's what they call them, even when they are still breathing and screaming through broken teeth.
-
-One of the doctors ran for the service elevator. They dragged him back before the doors shut. I heard him yelling that the air system was compromised and that the infection wasn't spreading the way LoE command thought it was. Nobody repeated those words afterward.
-
-I have served in riots, border actions, and two winters of insurgent cleanup. I have never seen men look this afraid.
-
-Something got loose tonight. We all heard it in the vents.`
-      },
-
-      restricted: {
-        title: "OMEGA_CLEARANCE_REQUIRED",
-        path: "ROOT/CLASSIFIED/OMEGA_ARCHIVE",
-        date: "Recovered Timestamp: ACCESS DENIED",
-        author: "System",
-        lockedContent: `[ACCESS DENIED]
-
-This archive segment requires OMEGA clearance.
-
-Corrupted fragments suggest the existence of:
-- a pre-release human exposure event
-- unauthorized rural field testing
-- falsified containment briefings
-- external sponsors removed from public record
-
-Remaining data unavailable.
-
-<span class="danger">ERROR: USER CREDENTIALS INSUFFICIENT</span>`,
-        unlockedTitle: "OMEGA_ARCHIVE.sys",
-        unlockedDate: "Recovered Timestamp: 2028-10-26 00:14",
-        unlockedAuthor: "OMEGA OVERRIDE CACHE",
-        unlockedContent: `[OMEGA ARCHIVE RECOVERY]
-
-The official timeline was fabricated before national quarantine began. Internal memoranda confirm that exposure outside controlled laboratory conditions occurred prior to the public emergency declaration. Multiple infections were observed in rural populations near transport corridors days before the military lockdown was announced.
-
-Recovered note fragment:
-"Field viability exceeded projections. Subjects remained mobile longer than predicted. Recommend narrative containment before biological containment."
-
-A second fragment references private sponsors with all names stripped from the record. Payment routing moved through medical shell organizations and defense procurement intermediaries. The language is clear enough even through the corruption: this program had outside backers, and they wanted results faster than any ethical review would permit.
-
-There is also evidence that certain containment briefings issued to soldiers and civil responders were deliberately falsified. Protective assumptions were softened. Transmission warnings were delayed. Some units were sent into hot zones without the truth.
-
-Recovered classification line:
-<span class="redacted">CABINET REVIEW APPENDIX / INTERNAL SURVIVAL TIERS / DO NOT DISCLOSE</span>
-
-Final surviving line from the archive:
-"If the population learns this was preventable, state continuity will not survive the week."`
-      },
-
-      fieldTesting: {
-        title: "FIELD_TEST_RESULTS_LOCKED",
-        path: "ROOT/CLASSIFIED/FIELD_TEST_RESULTS",
-        date: "Recovered Timestamp: ACCESS DENIED",
-        author: "System",
-        lockedContent: `[ACCESS DENIED]
-
-This archive segment requires elevated field operations clearance.
-
-Keywords recovered from corrupted index:
-- rural exposure event
-- transport corridor monitoring
-- behavioral endurance
-- civilian deniability package
-
-<span class="danger">ERROR: FIELD ACCESS KEY REQUIRED</span>`,
-        unlockedTitle: "FIELD_TEST_RESULTS.sys",
-        unlockedDate: "Recovered Timestamp: 2028-10-19 21:09",
-        unlockedAuthor: "External Evaluation Team",
-        unlockedContent: `[FIELD TEST SUMMARY]
-
-Controlled exposure was no longer considered sufficient to model outbreak behavior across dispersed populations. A limited-release event was approved along under-monitored rural corridors using contaminated transport waste and transient carriers with no direct ties to the research facilities.
-
-The goal was to observe whether the strain could establish itself in communities lacking immediate medical response or centralized reporting. It did.
-
-Hosts remained mobile long enough to spread behavioral destabilization into nearby settlements before civil authorities recognized a common pattern. By the time armed response units entered the affected villages, most local narratives had already been shaped around isolated violence, drug hysteria, or animal attacks.
-
-Site designation: <span class="redacted">GRID REFERENCE SCRUBBED</span>
-Civilian outcome estimate: <span class="corrupt">DATA CORRUPTED</span>
-
-Conclusion entered in final section:
-"Field viability confirmed. Panic response can be delayed if outbreak signatures are fragmented across rural populations."`
-      },
-
-      sponsorMemo: {
-        title: "SPONSOR_MEMO_LOCKED",
-        path: "ROOT/CLASSIFIED/SPONSOR_MEMO",
-        date: "Recovered Timestamp: ACCESS DENIED",
-        author: "System",
-        lockedContent: `[ACCESS DENIED]
-
-This archive segment requires executive sponsor key authorization.
-
-Visible metadata fragments:
-- accelerated timetable
-- private procurement
-- immunity from audit
-- results before quarter close
-
-<span class="danger">ERROR: SPONSOR KEY INVALID OR MISSING</span>`,
-        unlockedTitle: "SPONSOR_MEMO.sys",
-        unlockedDate: "Recovered Timestamp: 2028-10-11 12:42",
-        unlockedAuthor: "Executive Liaison Office",
-        unlockedContent: `[SPONSOR MEMORANDUM]
-
-To all project leads: timelines are not negotiable. The backers underwriting HV-13 are dissatisfied with repeated cautionary delays and have made it clear that deliverables must move from theory to demonstrable field relevance. Ethical review committees will not be consulted on this phase. Their purpose is optics, not progress.
-
-Any research lead unable to support accelerated implementation will be replaced. Any documentation likely to complicate continuation funding is to be summarized, sanitized, or routed into restricted annexes unavailable to standard audit staff.
-
-Sponsor identities: <span class="redacted">THREE NAMES REMOVED BY EXECUTIVE ORDER</span>
-Procurement channel: <span class="corrupt">BROKEN RECORD / SEE ANNEX ██-7</span>
-
-Remember the priority: survivable aggression control, host persistence, and scalable destabilization. The sponsors are not paying for treatment. They are paying for certainty.`
-      },
-
-      continuityDirective: {
-        title: "STATE_CONTINUITY_LOCKED",
-        path: "ROOT/CLASSIFIED/STATE_CONTINUITY",
-        date: "Recovered Timestamp: ACCESS DENIED",
-        author: "System",
-        lockedContent: `[ACCESS DENIED]
-
-This archive segment requires continuity cabinet key authentication.
-
-Indexed but unreadable references:
-- media narrative control
-- evacuation tiering
-- abandonment protocol
-- sacrificial quarantine zones
-
-<span class="danger">ERROR: CONTINUITY AUTHORIZATION FAILED</span>`,
-        unlockedTitle: "STATE_CONTINUITY.sys",
-        unlockedDate: "Recovered Timestamp: 2028-10-27 05:58",
-        unlockedAuthor: "Continuity Cabinet / Emergency Secretariat",
-        unlockedContent: `[STATE CONTINUITY DIRECTIVE]
-
-Preservation of government continuity supersedes preservation of population confidence. Regional sacrifice may be required to prevent national fragmentation. In the event that containment cannot be restored, selected population centers are to remain sealed long enough to preserve evacuation lanes for executive personnel, foreign envoys, defense archives, and strategic technical staff.
-
-Broadcast language is to emphasize temporary quarantine, ongoing relief coordination, and localized disturbances. Under no circumstances is the origin of the pathogen to be discussed in public channels. Any leak suggesting state complicity is to be treated as destabilization propaganda regardless of factual basis.
-
-Priority evacuation list: <span class="redacted">CABINET / DEFENSE LIAISONS / FOREIGN ASSETS / TIER OMEGA PERSONNEL</span>
-Population designation for hold zones: <span class="corrupt">UNRECOVERABLE TEXT STREAM</span>
-
-Final contingency clause:
-"If public order cannot be maintained, legitimacy will be preserved through narrative continuity rather than territorial control."`
-      }
-    };
-
-    const treeData = [
-      {
-        name: "SYSTEM_LOGS",
-        open: true,
-        children: [
-          { type: "file", key: "welcome", label: "BOOT_SEQUENCE.txt" },
-          { type: "file", key: "lastTransmission", label: "LAST_TRANSMISSION.txt" }
-        ]
-      },
-      {
-        name: "RESEARCH",
-        children: [
-          { type: "file", key: "hv13Origin", label: "PROJECT_HV13_ORIGIN.txt" },
-          { type: "file", key: "mutationReport", label: "MUTATION_REPORT.txt" },
-          { type: "file", key: "hostExperiment", label: "HOST_EXPERIMENT_LOG.txt", locked: true }
-        ]
-      },
-      {
-        name: "INCIDENT_REPORTS",
-        children: [
-          { type: "file", key: "convoyLoss", label: "CONVOY_LOSS.txt" },
-          { type: "file", key: "facilityShutdown", label: "FACILITY_SHUTDOWN.txt" }
-        ]
-      },
-      {
-        name: "MEDICAL_DATA",
-        children: [
-          { type: "file", key: "symptoms", label: "SYMPTOMS.txt" },
-          { type: "file", key: "infectionStages", label: "INFECTION_STAGES.txt" },
-          { type: "file", key: "patientAudio01", label: "PATIENT_AUDIO_01.wav" }
-        ]
-      },
-      {
-        name: "PERSONAL_LOGS",
-        children: [
-          { type: "file", key: "scientistJournal01", label: "SCIENTIST_JOURNAL_01.txt" },
-          { type: "file", key: "guardLog02", label: "GUARD_LOG_02.txt" }
-        ]
-      },
-      {
-        name: "CLASSIFIED",
-        children: [
-          { type: "file", key: "restricted", label: "OMEGA_ARCHIVE.sys", locked: true },
-          { type: "file", key: "fieldTesting", label: "FIELD_TEST_RESULTS.sys", locked: true },
-          { type: "file", key: "sponsorMemo", label: "SPONSOR_MEMO.sys", locked: true },
-          { type: "file", key: "continuityDirective", label: "STATE_CONTINUITY.sys", locked: true }
-        ]
-      }
+    const bootLines = [
+      "INITIALIZING PACNET NODE // CHERNARUS REGION",
+      "CHECKING BACKUP POWER.............OK",
+      "MOUNTING CIVIL ARCHIVE............OK",
+      "VERIFYING LOCAL RECORD INDEX......OK",
+      "SCANNING FOR ACTIVE NETWORK PEERS.ERROR // NO RESPONSE",
+      "LOADING PROVISIONAL AUTHORITY SEALS...OK",
+      "RECOVERING PUBLIC ACCESS MODULE....OK",
+      "WARNING // SOME FILES ARE INCOMPLETE OR CORRUPTED",
+      "WARNING // EXTERNAL COMMUNICATIONS UNAVAILABLE",
+      "ESTABLISHING LIMITED TERMINAL SESSION",
+      "WELCOME TO PACNET"
     ];
 
-    const treeRoot = document.getElementById("treeRoot");
-    const fileTitle = document.getElementById("fileTitle");
-    const fileMeta = document.getElementById("fileMeta");
-    const terminalOutput = document.getElementById("terminalOutput");
-    const audioPanel = document.getElementById("audioPanel");
-    const audioPlayer = document.getElementById("audioPlayer");
-    const audioSource = document.getElementById("audioSource");
-    const audioDescription = document.getElementById("audioDescription");
-    const passkeyModal = document.getElementById("passkeyModal");
-    const passkeyInput = document.getElementById("passkeyInput");
-    const passkeyMessage = document.getElementById("passkeyMessage");
-    const submitPasskey = document.getElementById("submitPasskey");
-    const cancelPasskey = document.getElementById("cancelPasskey");
-
-    let activeButton = null;
-    let typingTimer = null;
-
-    function renderTree(items, parent) {
-      items.forEach(item => {
-        if (item.type === "file") {
-          const li = document.createElement("li");
-          const btn = document.createElement("button");
-
-          btn.className = "file-btn" + (item.locked ? " locked" : "");
-          btn.textContent = item.label;
-          btn.dataset.key = item.key;
-          btn.addEventListener("click", () => openFile(item.key, btn));
-
-          li.appendChild(btn);
-          parent.appendChild(li);
-          return;
+    const folderData = {
+      overview: {
+        title: "System Overview",
+        path: "ROOT / SYSTEM OVERVIEW",
+        render() {
+          return `
+            <div class="card">
+              <h3>PACNET // Civil Access Summary</h3>
+              <div class="small">
+                The Provisional Authority and Civilian Network was established in the aftermath of the collapse to preserve a fragile structure of law, communication, and record-keeping. Though the Provisional Authority now struggles to project power across Chernarus, PACNET terminals still serve as islands of order in a broken land.
+              </div>
+            </div>
+            <div class="grid">
+              <div class="grid-card">
+                <h3>Purpose</h3>
+                <div class="small">Preserve settlement records, faction notices, survivor registrations, and archived reports concerning the outbreak and its aftermath.</div>
+              </div>
+              <div class="grid-card">
+                <h3>Status</h3>
+                <div class="small">Network degraded. Public files accessible. Many military and research records remain classified, damaged, or missing.</div>
+              </div>
+              <div class="grid-card">
+                <h3>Jurisdiction</h3>
+                <div class="small">Chernarus Territory // provisional civil oversight only. Enforcement authority varies by region.</div>
+              </div>
+            </div>
+            <div class="reader">
+              <h3>Available Directories</h3>
+              <pre>LORE ARCHIVE
+FACTION REGISTRY
+SETTLEMENT REGISTRY
+NOTICE BOARD
+PUBLIC REGISTRY
+SECURITY LOGS</pre>
+            </div>
+          `;
         }
+      },
+      lore: {
+        title: "Lore Archive",
+        path: "ROOT / LORE ARCHIVE",
+        files: [
+          {
+            name: "OUTBREAK_OVERVIEW.txt",
+            meta: "Recovered Public Briefing",
+            text: `The infection did not arrive as rumor first. It arrived as confusion.
 
-        const li = document.createElement("li");
-        li.className = "folder" + (item.open ? " open" : "");
+What began as isolated medical irregularities became a pattern of fever, delirium, violent episodes, and catastrophic systemic collapse. In the early days, the public was told to remain calm. Local authorities described the crisis as a severe biological event under containment.
 
-        const label = document.createElement("button");
-        label.className = "folder-label";
-        label.textContent = item.name;
-        label.addEventListener("click", () => li.classList.toggle("open"));
+Containment failed.
 
-        const nested = document.createElement("ul");
-        renderTree(item.children || [], nested);
+Chernarus suffered infrastructure loss, mass civilian displacement, and the rapid breakdown of supply and communication networks. The dead did not remain still. The infected did not remain human for long.`
+          },
+          {
+            name: "ORIGIN_THEORY.txt",
+            meta: "Restricted Summary // Sanitized Copy",
+            text: `Official PACNET public records avoid assigning final blame. Unofficial survivor testimony speaks of laboratory secrecy, quarantined transport routes, and the quiet disappearance of entire teams.
 
-        li.appendChild(label);
-        li.appendChild(nested);
-        parent.appendChild(li);
-      });
+Some believe the infection began as a failed biomedical initiative. Others insist it was a mutation carried through contaminated blood, treatment programs, or rushed emergency research.
+
+What matters now is this: whatever the infection was, it spread faster than truth.`
+          },
+          {
+            name: "THE_COLLAPSE_OF_ORDER.txt",
+            meta: "Civilian Archive",
+            text: `As central authority fractured, surviving officials, civil workers, and remnants of the old state assembled emergency networks to preserve what remained. PACNET was one such effort: a terminal-based archive intended to keep records alive even where governments could not.
+
+Its existence is proof of two things:
+1. Somebody tried to keep civilization standing.
+2. They were already losing when this system came online.`
+          }
+        ]
+      },
+      factions: {
+        title: "Faction Registry",
+        path: "ROOT / FACTION REGISTRY",
+        files: [
+          {
+            name: "PROVISIONAL_AUTHORITY.reg",
+            meta: "Recognized Government Remnant",
+            text: `The Provisional Authority claims continuity with the pre-collapse state. It maintains records, issues decrees, oversees select checkpoints, and attempts to legitimize surviving settlements through registration.
+
+Public Image: Law, order, continuity.
+Reality: Understaffed, overstretched, and no longer able to dominate the territory it claims.`
+          },
+          {
+            name: "LOE_PHARMACEUTICALS.reg",
+            meta: "Licensed Medical-Industrial Entity",
+            text: `LOE Pharmaceuticals presents itself as a vital medical and research power operating where conventional systems failed. Its caravans move medicine, equipment, and trained specialists between enclaves.
+
+Public Image: Recovery, medicine, scientific discipline.
+Field Notes: Access to their internal operations remains limited. Their influence often exceeds their declared mandate.`
+          },
+          {
+            name: "THE_PRIDE.reg",
+            meta: "Hostile Raider Confederation",
+            text: `The Pride is among the most organized and feared hostile groups in Chernarus. Unlike common bandits, they display discipline, hierarchy, and a taste for spectacle. Their attacks are often brutal, deliberate, and intended to terrify survivors into submission.
+
+Threat Level: Severe.
+Recommended Action: Avoid isolated routes. Travel in numbers. Report sightings immediately.`
+          },
+          {
+            name: "THE_TRADE_AUTHORITY.reg",
+            meta: "Commercial Power Bloc",
+            text: `The Trade Authority controls routes, tariffs, brokered exchanges, and access to large-scale trade. It thrives where scarcity has made commerce as powerful as armies.
+
+Public Image: Stability through trade.
+Operational Reality: Every road, market, and deal carries a price.`
+          }
+        ]
+      },
+      settlements: {
+        title: "Settlement Registry",
+        path: "ROOT / SETTLEMENT REGISTRY",
+        files: [
+          {
+            name: "NOVODMITROVSK_REGISTER.txt",
+            meta: "Example Settlement Entry",
+            text: `Settlement Name: Novodmitrovsk Exchange
+Status: Registered
+Control: Mixed Civilian / Trade Authority Influence
+Summary: A major urban survivor hub built around secured blocks, salvage teams, and protected market access.
+Needs: Medical stock, generators, perimeter labor.`
+          },
+          {
+            name: "GREEN_MOUNTAIN_OUTPOST.txt",
+            meta: "Keep this as mY Example Settlement Entry",
+            text: `Settlement Name: Green Mountain Outpost
+Status: Conditional Registration
+Control: Local Militia Alignment
+Summary: Elevated signal outpost and refuge for travelers. Limited capacity but strategically valuable.
+Needs: Ammunition, radio parts, fuel.`
+          }
+        ]
+      },
+      notice: {
+        title: "Notice Board",
+        path: "ROOT / NOTICE BOARD",
+        files: [
+          {
+            name: "BOUNTY_LISTINGS.txt",
+            meta: "Public Notices",
+            text: `ACTIVE BOUNTIES
+
+1. CALLSIGN: MARROW
+Last Known Area: Northern treeline west of Gvozdno
+Charges: Highway robbery, murder of registered couriers, theft of medical cargo
+Known Associates: Two masked riflemen, one driver using a dark utility truck
+Reward: 18,000 credits and trade consideration
+
+2. CALLSIGN: RAGPICKER
+Last Known Area: Industrial yards near Cherno
+Charges: Kidnapping, extortion, black market trafficking of ration cards
+Known Associates: Unknown
+Reward: 9,500 credits`
+          },
+          {
+            name: "JOBS_AND_CONTRACTS.txt",
+            meta: "Civil Requests",
+            text: `- Caravan guards needed for southbound convoy.
+- Mechanic requested for generator repairs in a registered settlement.
+- Medical runner contract available for urgent antibiotic delivery.
+- Scouts requested to verify road safety between inland farmsteads.`
+          }
+        ]
+      },
+      public: {
+        title: "Public Registry",
+        path: "ROOT / PUBLIC REGISTRY",
+        files: [
+          {
+            name: "CHARACTER_RECORD_TEMPLATE.txt",
+            meta: "Registry Format",
+            text: `Name:
+Known Alias:
+Place of Origin:
+Current Allegiance:
+Occupation:
+Known Associations:
+Public Summary:
+Last Confirmed Sighting:`
+          },
+          {
+            name: "PUBLIC_DOSSIER_001.txt",
+            meta: "Example Character Record",
+            text: `Name: Elianora "The Table is Glass" Bauer
+Known Alias: Fondler
+Place of Origin: South of the Border
+Current Allegiance: Any Master
+Occupation: Prostitute
+Known Associations: Trade Authority checkpoint contacts, unnamed villagers
+Public Summary: Known for sucking a golf ball through a straw.`
+          }
+        ]
+      },
+      security: {
+        title: "Security Logs",
+        path: "ROOT / SECURITY LOGS",
+        files: [
+          {
+            name: "AUTH_FAILURE_LOG.txt",
+            meta: "Automated Security Record",
+            text: `Repeated unauthorized access attempts recorded.
+Node integrity remains stable.
+Several recovery override attempts were successful under degraded security conditions.
+Recommendation: Physical supervision required. No staff available.`
+          },
+          {
+            name: "NODE_STATUS.txt",
+            meta: "System Health",
+            text: `Power Source: Auxiliary
+Network Status: Fragmented
+Terminal Integrity: Functional
+Archive Stability: Partial
+Long-Range Uplink: Offline`
+          }
+        ]
+      }
+    };
+
+    const validCredentials = {
+      username: "visitor",
+      password: "chernarus"
+    };
+
+    const bootScreen = document.getElementById("bootScreen");
+    const bootConsole = document.getElementById("bootConsole");
+    const loginScreen = document.getElementById("loginScreen");
+    const hackScreen = document.getElementById("hackScreen");
+    const terminalScreen = document.getElementById("terminalScreen");
+    const loginBtn = document.getElementById("loginBtn");
+    const hackBtn = document.getElementById("hackBtn");
+    const rebootBtn = document.getElementById("rebootBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const backToLoginBtn = document.getElementById("backToLoginBtn");
+    const loginStatus = document.getElementById("loginStatus");
+    const hackGrid = document.getElementById("hackGrid");
+    const hackStatus = document.getElementById("hackStatus");
+    const attemptsLeft = document.getElementById("attemptsLeft");
+    const folderTitle = document.getElementById("folderTitle");
+    const pathLabel = document.getElementById("pathLabel");
+    const contentBody = document.getElementById("contentBody");
+    const clock = document.getElementById("clock");
+
+    let hackCode = "";
+    let hackAttempts = 4;
+
+    function updateClock() {
+      const now = new Date();
+      const stamp = now.toLocaleTimeString([], { hour12: false });
+      clock.textContent = `SYSTEM TIME ${stamp}`;
     }
 
-    function prepareTypingMarkup(htmlText) {
-      return htmlText
-        .replace(/<span class="redacted">([\s\S]*?)<\/span>/g, (_, text) => `@@REDSTART@@${text}@@REDEND@@`)
-        .replace(/<span class="danger">([\s\S]*?)<\/span>/g, (_, text) => `@@DANGERSTART@@${text}@@DANGEREND@@`)
-        .replace(/<span class="corrupt">([\s\S]*?)<\/span>/g, (_, text) => `@@CORRUPTSTART@@${text}@@CORRUPTEND@@`)
-        .replace(/<span class="corrupt-block">([\s\S]*?)<\/span>/g, (_, text) => `@@CORRUPTBLOCKSTART@@${text}@@CORRUPTBLOCKEND@@`);
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function finalizeTypingMarkup(text) {
-      return text
-        .replace(/@@REDSTART@@([\s\S]*?)@@REDEND@@/g, '<span class="redacted">$1</span>')
-        .replace(/@@DANGERSTART@@([\s\S]*?)@@DANGEREND@@/g, '<span class="danger">$1</span>')
-        .replace(/@@CORRUPTSTART@@([\s\S]*?)@@CORRUPTEND@@/g, '<span class="corrupt">$1</span>')
-        .replace(/@@CORRUPTBLOCKSTART@@([\s\S]*?)@@CORRUPTBLOCKEND@@/g, '<span class="corrupt-block">$1</span>')
-        .replace(/\n/g, "<br>");
-    }
+    async function bootSequence() {
+      bootConsole.textContent = "";
+      bootScreen.classList.remove("hidden");
+      loginScreen.classList.add("hidden");
+      hackScreen.classList.add("hidden");
+      terminalScreen.classList.add("hidden");
 
-    function typeText(target, htmlText, speed = 10) {
-      clearTimeout(typingTimer);
-      target.innerHTML = "<span class='typing'></span>";
-      const typingSpan = target.querySelector(".typing");
-
-      const prepared = prepareTypingMarkup(htmlText);
-      let index = 0;
-
-      function step() {
-        const currentText = prepared.slice(0, index);
-        typingSpan.innerHTML = finalizeTypingMarkup(currentText);
-
-        index += 2;
-        if (index <= prepared.length) {
-          typingTimer = setTimeout(step, speed);
-        } else {
-          target.innerHTML = finalizeTypingMarkup(prepared);
-        }
+      for (const line of bootLines) {
+        bootConsole.textContent += line + "\n";
+        bootConsole.scrollTop = bootConsole.scrollHeight;
+        await sleep(350 + Math.random() * 250);
       }
 
-      step();
+      await sleep(700);
+      bootScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+      loginStatus.textContent = "";
+      loginStatus.className = "status";
     }
 
-    function showPasskeyModal(key, btn) {
-      passkeyModal.style.display = "flex";
-      passkeyMessage.textContent = "";
-      passkeyInput.value = "";
-      passkeyInput.focus();
-
-      submitPasskey.onclick = () => {
-        const attempt = passkeyInput.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-        const expected = (CLASSIFIED_PASSKEYS[key] || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-
-        if (attempt === expected) {
-          unlockedFiles.add(key);
-          passkeyModal.style.display = "none";
-          openFile(key, btn, true);
-        } else {
-          passkeyMessage.textContent = "ACCESS DENIED // INVALID PASSKEY";
-        }
-      };
+    function showHackScreen() {
+      loginScreen.classList.add("hidden");
+      hackScreen.classList.remove("hidden");
+      startHackGame();
     }
 
-    cancelPasskey.addEventListener("click", () => {
-      passkeyModal.style.display = "none";
-    });
+    function showLoginScreen() {
+      hackScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+      hackStatus.textContent = "";
+      hackStatus.className = "status";
+    }
 
-    passkeyModal.addEventListener("click", (e) => {
-      if (e.target === passkeyModal) {
-        passkeyModal.style.display = "none";
-      }
-    });
+    function launchTerminal() {
+      loginScreen.classList.add("hidden");
+      hackScreen.classList.add("hidden");
+      terminalScreen.classList.remove("hidden");
+      renderFolder("overview");
+    }
 
-    passkeyInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        submitPasskey.click();
-      }
-    });
+    function renderFolder(key) {
+      const folder = folderData[key];
+      if (!folder) return;
 
-    function openFile(key, btn, bypassPrompt = false) {
-      const file = files[key];
-      if (!file) return;
+      folderTitle.textContent = folder.title;
+      pathLabel.textContent = folder.path;
 
-      const isClassified = Object.prototype.hasOwnProperty.call(CLASSIFIED_PASSKEYS, key);
-      const isUnlocked = unlockedFiles.has(key);
-
-      if (isClassified && !isUnlocked && !bypassPrompt) {
-        showPasskeyModal(key, btn);
+      if (typeof folder.render === "function") {
+        contentBody.innerHTML = folder.render();
         return;
       }
 
-      if (activeButton) {
-        activeButton.classList.remove("active");
-      }
+      contentBody.innerHTML = `
+        <div class="card">
+          <h3>${folder.title}</h3>
+          <div class="small">Select and read archived entries below.</div>
+        </div>
+        <div class="file-list">
+          ${folder.files.map((file, index) => `
+            <button class="file-open" data-folder="${key}" data-index="${index}">> ${file.name}</button>
+          `).join("")}
+        </div>
+        <div class="reader" id="readerPane">
+          <h3>${folder.files[0].name}</h3>
+          <div class="meta">${folder.files[0].meta}</div>
+          <pre>${folder.files[0].text}</pre>
+        </div>
+      `;
 
-      if (btn) {
-        btn.classList.add("active");
-        activeButton = btn;
-      }
-
-      const showUnlockedView = isClassified && isUnlocked;
-      const activeContent = showUnlockedView
-        ? file.unlockedContent
-        : (file.lockedContent || file.content);
-
-      fileTitle.textContent = showUnlockedView ? file.unlockedTitle : file.title;
-      fileMeta.textContent =
-        `${file.path}\n${showUnlockedView ? file.unlockedDate : file.date}\nAuthor: ${showUnlockedView ? file.unlockedAuthor : file.author}`;
-
-      const activeAudioSrc = showUnlockedView
-        ? (file.unlockedAudioSrc || file.audioSrc)
-        : file.audioSrc;
-
-      const activeAudioDescription = showUnlockedView
-        ? (file.unlockedAudioDescription || file.audioDescription)
-        : file.audioDescription;
-
-      if (activeAudioSrc) {
-        audioPanel.classList.add("active");
-        audioDescription.textContent = activeAudioDescription || "Recovered archive audio.";
-        audioSource.src = activeAudioSrc;
-        audioPlayer.load();
-      } else {
-        audioPanel.classList.remove("active");
-        audioPlayer.pause();
-        audioSource.src = "";
-        audioPlayer.load();
-        audioDescription.textContent = "";
-      }
-
-      typeText(terminalOutput, activeContent, 8);
+      document.querySelectorAll(".file-open").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const file = folderData[btn.dataset.folder].files[Number(btn.dataset.index)];
+          const pane = document.getElementById("readerPane");
+          pane.innerHTML = `
+            <h3>${file.name}</h3>
+            <div class="meta">${file.meta}</div>
+            <pre>${file.text}</pre>
+          `;
+        });
+      });
     }
 
-    renderTree(treeData, treeRoot);
+    function randomCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let result = "";
+      for (let i = 0; i < 4; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return result;
+    }
 
-    window.addEventListener("load", () => {
-      const initialButton = document.querySelector('[data-key="welcome"]');
-      openFile("welcome", initialButton);
+    function evaluateGuess(guess) {
+      let matches = 0;
+      for (let i = 0; i < guess.length; i++) {
+        if (guess[i] === hackCode[i]) matches++;
+      }
+      return matches;
+    }
+
+    function startHackGame() {
+      hackAttempts = 4;
+      attemptsLeft.textContent = String(hackAttempts);
+      hackStatus.textContent = "";
+      hackStatus.className = "status";
+      hackCode = randomCode();
+
+      const guesses = new Set([hackCode]);
+      while (guesses.size < 8) {
+        guesses.add(randomCode());
+      }
+
+      const options = Array.from(guesses).sort(() => Math.random() - 0.5);
+      hackGrid.innerHTML = "";
+
+      options.forEach(code => {
+        const btn = document.createElement("button");
+        btn.className = "hack-code";
+        btn.textContent = code;
+        btn.type = "button";
+        btn.addEventListener("click", () => {
+          if (code === hackCode) {
+            hackStatus.textContent = `ACCESS GRANTED // Recovery hash ${code} accepted.`;
+            hackStatus.className = "status";
+            setTimeout(launchTerminal, 700);
+            return;
+          }
+
+          hackAttempts -= 1;
+          attemptsLeft.textContent = String(hackAttempts);
+          const correctPositions = evaluateGuess(code);
+          hackStatus.textContent = `INVALID HASH // ${correctPositions} character(s) correctly placed.`;
+          hackStatus.className = "status error";
+          btn.disabled = true;
+          btn.style.opacity = "0.45";
+
+          if (hackAttempts <= 0) {
+            hackStatus.textContent = `OVERRIDE FAILED // Recovery lockout triggered. Correct hash was ${hackCode}.`;
+            hackStatus.className = "status error";
+            setTimeout(startHackGame, 1500);
+          }
+        });
+        hackGrid.appendChild(btn);
+      });
+    }
+
+    loginBtn.addEventListener("click", () => {
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      const password = document.getElementById("password").value.trim().toLowerCase();
+
+      if (username === validCredentials.username && password === validCredentials.password) {
+        loginStatus.textContent = "Credentials accepted. Opening PACNET session...";
+        loginStatus.className = "status";
+        setTimeout(launchTerminal, 500);
+      } else {
+        loginStatus.textContent = "Access denied. Invalid user ID or passphrase.";
+        loginStatus.className = "status error";
+      }
     });
+
+    hackBtn.addEventListener("click", showHackScreen);
+    backToLoginBtn.addEventListener("click", showLoginScreen);
+    rebootBtn.addEventListener("click", bootSequence);
+    logoutBtn.addEventListener("click", () => {
+      terminalScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+      loginStatus.textContent = "Session ended.";
+      loginStatus.className = "status";
+    });
+
+    document.querySelectorAll("[data-folder]").forEach(btn => {
+      btn.addEventListener("click", () => renderFolder(btn.dataset.folder));
+    });
+
+    document.getElementById("password").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") loginBtn.click();
+    });
+
+    document.getElementById("username").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") document.getElementById("password").focus();
+    });
+
+    bootSequence();
   </script>
 </body>
 </html>
